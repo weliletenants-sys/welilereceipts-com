@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchWithAuth } from '@/lib/apiClient';
 import { useAuth } from '@/hooks/useAuth';
-import { useGeoLocation } from '@/hooks/useGeoLocation';
+import { useGPSLocation } from '@/hooks/useGPSLocation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -39,7 +40,7 @@ export default function LandlordRegistrationForm({
   toastFn,
 }: LandlordRegistrationFormProps) {
   const { user } = useAuth();
-  const { location, loading: locationLoading, error: locationError, captureLocation } = useGeoLocation();
+  const { location, loading: locationLoading, error: locationError, captureLocation } = useGPSLocation();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [activationLink, setActivationLink] = useState('');
@@ -126,63 +127,34 @@ export default function LandlordRegistrationForm({
     setLoading(true);
 
     try {
-      const { data: existing } = await supabase
-        .from('landlords')
-        .select('id')
-        .eq('phone', landlordPhone.trim())
-        .maybeSingle();
-
-      if (existing) {
-        toastFn({ title: 'Already Exists', description: 'A landlord with this phone number already exists.', variant: 'destructive' });
-        setLoading(false);
-        return;
-      }
-
-      const insertData: Record<string, unknown> = {
-        name: landlordName.trim(),
-        phone: landlordPhone.trim(),
-        property_address: propertyAddress.trim(),
-        registered_by: user.id,
-        latitude: location?.latitude || null,
-        longitude: location?.longitude || null,
-        location_captured_at: location ? new Date().toISOString() : null,
-        location_captured_by: location ? user.id : null,
-        mobile_money_name: momoName.trim() || null,
-        mobile_money_number: momoNumber.trim() || null,
-        water_meter_number: nwscMeter.trim() || null,
-        electricity_meter_number: uedclMeter.trim() || null,
-        number_of_houses: numberOfRentals ? parseInt(numberOfRentals) : null,
-        house_category: houseCategory || null,
-      };
-
-      if (registeredByRole === 'tenant') {
-        insertData.tenant_id = user.id;
-      }
-
-      const { error } = await supabase.from('landlords').insert(insertData as any);
-      if (error) throw error;
-
-      // Create activation invite
-      const placeholderEmail = `${landlordPhone.trim().replace(/[^0-9]/g, '')}@welile.user`;
-      const { data: invite } = await supabase
-        .from('supporter_invites')
-        .insert({
-          created_by: user.id,
-          full_name: landlordName.trim(),
+      const response = await fetchWithAuth('/auth/landlord', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: landlordName.trim(),
           phone: landlordPhone.trim(),
-          email: placeholderEmail,
-          temp_password: tempPassword,
-          role: 'landlord',
           property_address: propertyAddress.trim(),
-          latitude: location?.latitude || null,
-          longitude: location?.longitude || null,
-          location_accuracy: location?.accuracy || null,
-        })
-        .select('activation_token')
-        .single();
+          temp_password: tempPassword,
+          tenant_id: registeredByRole === 'tenant' ? user.id : undefined,
+          latitude: location?.latitude || undefined,
+          longitude: location?.longitude || undefined,
+          location_captured_at: location ? new Date().toISOString() : undefined,
+          mobile_money_name: momoName.trim() || undefined,
+          mobile_money_number: momoNumber.trim() || undefined,
+          water_meter_number: nwscMeter.trim() || undefined,
+          electricity_meter_number: uedclMeter.trim() || undefined,
+          number_of_houses: numberOfRentals ? parseInt(numberOfRentals) : undefined,
+          house_category: houseCategory || undefined,
+        }),
+      });
 
-      if (invite) {
-        setActivationLink(`${window.location.origin}/join?t=${invite.activation_token}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to register landlord.');
+      }
+
+      if (data.activation_token) {
+        setActivationLink(`${window.location.origin}/join?t=${data.activation_token}`);
       }
 
       setSuccess(true);

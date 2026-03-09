@@ -19,6 +19,8 @@ model AgentAdvanceLedger {
   interest_accrued Float
   opening_balance Float
 
+  advance_id String?
+  advance_rel AgentAdvances? @relation("agent_advance_ledger_advance_id", fields: [advance_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("agent_advance_ledger")
 }
 
@@ -28,6 +30,9 @@ model AgentAdvanceTopups {
   id String @id @default(uuid())
   topped_up_by String
 
+  advance_id String?
+  advance_rel AgentAdvances? @relation("agent_advance_topups_advance_id", fields: [advance_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  topped_up_by_rel Profiles? @relation("agent_advance_topups_topped_up_by", fields: [topped_up_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("agent_advance_topups")
 }
 
@@ -45,6 +50,11 @@ model AgentAdvances {
   status String
   updated_at String
 
+  agent_id String?
+  agent_rel Profiles? @relation("agent_advances_agent_id", fields: [agent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  issued_by_rel Profiles? @relation("agent_advances_issued_by", fields: [issued_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  agent_advance_topups_advance_id AgentAdvanceTopups[] @relation("agent_advance_topups_advance_id")
+  agent_advance_ledger_advance_id AgentAdvanceLedger[] @relation("agent_advance_ledger_advance_id")
   @@map("agent_advances")
 }
 
@@ -56,6 +66,12 @@ model AgentCollections {
   id String @id @default(uuid())
   payment_method String
 
+  agent_id String?
+  agent_rel Profiles? @relation("agent_collections_agent_id", fields: [agent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tenant_id String?
+  tenant_rel Profiles? @relation("agent_collections_tenant_id", fields: [tenant_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  token_id String?
+  token_rel PaymentTokens? @relation("agent_collections_token_id", fields: [token_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("agent_collections")
 }
 
@@ -97,6 +113,9 @@ model AgentFloatLimits {
   last_reset_date String
   updated_at String
 
+  agent_id String?
+  agent_rel Profiles? @relation("agent_float_limits_agent_id", fields: [agent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  assigned_by_rel Profiles? @relation("agent_float_limits_assigned_by", fields: [assigned_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("agent_float_limits")
 }
 
@@ -123,6 +142,8 @@ model AgentReceipts {
   receipt_image_url String?
   transaction_id String?
 
+  agent_id String?
+  agent_rel Profiles? @relation("agent_receipts_agent_id", fields: [agent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("agent_receipts")
 }
 
@@ -142,6 +163,11 @@ model AgentVisits {
   latitude Float
   longitude Float
 
+  agent_id String?
+  agent_rel Profiles? @relation("agent_visits_agent_id", fields: [agent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tenant_id String?
+  tenant_rel Profiles? @relation("agent_visits_tenant_id", fields: [tenant_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payment_tokens_visit_id PaymentTokens[] @relation("payment_tokens_visit_id")
   @@map("agent_visits")
 }
 
@@ -160,6 +186,8 @@ model CartItems {
   quantity Float
   updated_at String
 
+  product_id String?
+  product_rel Products? @relation("cart_items_product_id", fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("cart_items")
 }
 
@@ -168,6 +196,8 @@ model ConversationParticipants {
   joined_at String
   last_read_at String?
 
+  conversation_id String?
+  conversation_rel Conversations? @relation("conversation_participants_conversation_id", fields: [conversation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("conversation_participants")
 }
 
@@ -176,6 +206,8 @@ model Conversations {
   id String @id @default(uuid())
   updated_at String
 
+  messages_conversation_id Messages[] @relation("messages_conversation_id")
+  conversation_participants_conversation_id ConversationParticipants[] @relation("conversation_participants_conversation_id")
   @@map("conversations")
 }
 
@@ -219,6 +251,7 @@ model CreditRequestDetails {
   updated_at String
   water_meter_number String?
 
+  loan_rel UserLoans? @relation("credit_request_details_loan_id", fields: [loan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("credit_request_details")
 }
 
@@ -326,6 +359,10 @@ model InvestorPortfolios {
   status String
   total_roi_earned Float
 
+  investor_rel Profiles? @relation("investor_portfolios_investor_id", fields: [investor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  invite_rel SupporterInvites? @relation("investor_portfolios_invite_id", fields: [invite_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  agent_id String?
+  agent_rel Profiles? @relation("investor_portfolios_agent_id", fields: [agent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("investor_portfolios")
 }
 
@@ -379,6 +416,8 @@ model Landlords {
   village String?
   water_meter_number String?
 
+  verified_by_rel Profiles? @relation("landlords_verified_by", fields: [verified_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  rent_requests_landlord_id RentRequests[] @relation("rent_requests_landlord_id")
   @@map("landlords")
 }
 
@@ -389,6 +428,7 @@ model Lc1Chairpersons {
   phone String
   village String
 
+  rent_requests_lc1_id RentRequests[] @relation("rent_requests_lc1_id")
   @@map("lc1_chairpersons")
 }
 
@@ -397,6 +437,7 @@ model LedgerAccountGroups {
   description String
   group_code String
 
+  ledger_accounts_group_id LedgerAccounts[] @relation("ledger_accounts_group_id")
   @@map("ledger_account_groups")
 }
 
@@ -409,6 +450,9 @@ model LedgerAccounts {
   owner_id String?
   owner_type String?
 
+  group_id String?
+  group_rel LedgerAccountGroups? @relation("ledger_accounts_group_id", fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ledger_entries_account_id LedgerEntries[] @relation("ledger_entries_account_id")
   @@map("ledger_accounts")
 }
 
@@ -419,6 +463,10 @@ model LedgerEntries {
   currency String?
   direction String
 
+  transaction_id String?
+  transaction_rel LedgerTransactions? @relation("ledger_entries_transaction_id", fields: [transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  account_id String?
+  account_rel LedgerAccounts? @relation("ledger_entries_account_id", fields: [account_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("ledger_entries")
 }
 
@@ -433,6 +481,8 @@ model LedgerTransactions {
   source_table String?
   transaction_group_id String?
 
+  transaction_approvals_transaction_id TransactionApprovals[] @relation("transaction_approvals_transaction_id")
+  ledger_entries_transaction_id LedgerEntries[] @relation("ledger_entries_transaction_id")
   @@map("ledger_transactions")
 }
 
@@ -458,6 +508,8 @@ model LocationRequests {
   target_role String
   token String
 
+  rent_request_id String?
+  rent_request_rel RentRequests? @relation("location_requests_rent_request_id", fields: [rent_request_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("location_requests")
 }
 
@@ -467,6 +519,8 @@ model Messages {
   id String @id @default(uuid())
   read_at String?
 
+  conversation_id String?
+  conversation_rel Conversations? @relation("messages_conversation_id", fields: [conversation_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("messages")
 }
 
@@ -543,6 +597,12 @@ model PaymentTokens {
   used_at String?
   visit_id String?
 
+  agent_id String?
+  agent_rel Profiles? @relation("payment_tokens_agent_id", fields: [agent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tenant_id String?
+  tenant_rel Profiles? @relation("payment_tokens_tenant_id", fields: [tenant_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  visit_rel AgentVisits? @relation("payment_tokens_visit_id", fields: [visit_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  agent_collections_token_id AgentCollections[] @relation("agent_collections_token_id")
   @@map("payment_tokens")
 }
 
@@ -584,6 +644,8 @@ model ProductImages {
   id String @id @default(uuid())
   image_url String
 
+  product_id String?
+  product_rel Products? @relation("product_images_product_id", fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("product_images")
 }
 
@@ -599,6 +661,9 @@ model ProductOrders {
   total_price Float
   unit_price Float
 
+  product_id String?
+  product_rel Products? @relation("product_orders_product_id", fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  product_reviews_order_id ProductReviews[] @relation("product_reviews_order_id")
   @@map("product_orders")
 }
 
@@ -610,6 +675,12 @@ model ProductReviews {
   rating Float
   updated_at String
 
+  product_id String?
+  product_rel Products? @relation("product_reviews_product_id", fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  order_rel ProductOrders? @relation("product_reviews_order_id", fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  review_responses_review_id ReviewResponses[] @relation("review_responses_review_id")
+  review_votes_review_id ReviewVotes[] @relation("review_votes_review_id")
+  review_images_review_id ReviewImages[] @relation("review_images_review_id")
   @@map("product_reviews")
 }
 
@@ -627,6 +698,11 @@ model Products {
   stock Float
   updated_at String
 
+  product_images_product_id ProductImages[] @relation("product_images_product_id")
+  cart_items_product_id CartItems[] @relation("cart_items_product_id")
+  wishlists_product_id Wishlists[] @relation("wishlists_product_id")
+  product_reviews_product_id ProductReviews[] @relation("product_reviews_product_id")
+  product_orders_product_id ProductOrders[] @relation("product_orders_product_id")
   @@map("products")
 }
 
@@ -657,6 +733,24 @@ model Profiles {
   whatsapp_verified Boolean?
   whatsapp_verified_at String?
 
+  investor_portfolios_agent_id InvestorPortfolios[] @relation("investor_portfolios_agent_id")
+  investor_portfolios_investor_id InvestorPortfolios[] @relation("investor_portfolios_investor_id")
+  agent_receipts_agent_id AgentReceipts[] @relation("agent_receipts_agent_id")
+  agent_collections_tenant_id AgentCollections[] @relation("agent_collections_tenant_id")
+  agent_collections_agent_id AgentCollections[] @relation("agent_collections_agent_id")
+  agent_advance_topups_topped_up_by AgentAdvanceTopups[] @relation("agent_advance_topups_topped_up_by")
+  agent_advances_issued_by AgentAdvances[] @relation("agent_advances_issued_by")
+  agent_advances_agent_id AgentAdvances[] @relation("agent_advances_agent_id")
+  landlords_verified_by Landlords[] @relation("landlords_verified_by")
+  payment_tokens_tenant_id PaymentTokens[] @relation("payment_tokens_tenant_id")
+  payment_tokens_agent_id PaymentTokens[] @relation("payment_tokens_agent_id")
+  agent_visits_tenant_id AgentVisits[] @relation("agent_visits_tenant_id")
+  agent_visits_agent_id AgentVisits[] @relation("agent_visits_agent_id")
+  agent_float_limits_assigned_by AgentFloatLimits[] @relation("agent_float_limits_assigned_by")
+  agent_float_limits_agent_id AgentFloatLimits[] @relation("agent_float_limits_agent_id")
+  rent_requests_manager_verified_by RentRequests[] @relation("rent_requests_manager_verified_by")
+  rent_requests_agent_verified_by RentRequests[] @relation("rent_requests_agent_verified_by")
+  password_hash String?
   @@map("profiles")
 }
 
@@ -680,6 +774,9 @@ model ReceiptNumbers {
   vendor_amount Float?
   vendor_marked_at String?
 
+  vendor_id String?
+  vendor_rel Vendors? @relation("receipt_numbers_vendor_id", fields: [vendor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_receipts_receipt_number_id UserReceipts[] @relation("user_receipts_receipt_number_id")
   @@map("receipt_numbers")
 }
 
@@ -754,6 +851,15 @@ model RentRequests {
   total_roi_paid Float?
   updated_at String
 
+  landlord_id String?
+  landlord_rel Landlords? @relation("rent_requests_landlord_id", fields: [landlord_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  lc1_rel Lc1Chairpersons? @relation("rent_requests_lc1_id", fields: [lc1_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  agent_verified_by_rel Profiles? @relation("rent_requests_agent_verified_by", fields: [agent_verified_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  manager_verified_by_rel Profiles? @relation("rent_requests_manager_verified_by", fields: [manager_verified_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  location_requests_rent_request_id LocationRequests[] @relation("location_requests_rent_request_id")
+  subscription_charges_rent_request_id SubscriptionCharges[] @relation("subscription_charges_rent_request_id")
+  supporter_roi_payments_rent_request_id SupporterRoiPayments[] @relation("supporter_roi_payments_rent_request_id")
+  repayments_rent_request_id Repayments[] @relation("repayments_rent_request_id")
   @@map("rent_requests")
 }
 
@@ -762,6 +868,8 @@ model Repayments {
   created_at String
   id String @id @default(uuid())
 
+  rent_request_id String?
+  rent_request_rel RentRequests? @relation("repayments_rent_request_id", fields: [rent_request_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("repayments")
 }
 
@@ -771,6 +879,8 @@ model ReviewImages {
   id String @id @default(uuid())
   image_url String
 
+  review_id String?
+  review_rel ProductReviews? @relation("review_images_review_id", fields: [review_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("review_images")
 }
 
@@ -780,6 +890,8 @@ model ReviewResponses {
   response_text String
   updated_at String
 
+  review_id String?
+  review_rel ProductReviews? @relation("review_responses_review_id", fields: [review_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("review_responses")
 }
 
@@ -788,6 +900,8 @@ model ReviewVotes {
   id String @id @default(uuid())
   vote_type String
 
+  review_id String?
+  review_rel ProductReviews? @relation("review_votes_review_id", fields: [review_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("review_votes")
 }
 
@@ -802,6 +916,8 @@ model SubscriptionChargeLogs {
   wallet_balance_after Float?
   wallet_balance_before Float?
 
+  subscription_id String?
+  subscription_rel SubscriptionCharges? @relation("subscription_charge_logs_subscription_id", fields: [subscription_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("subscription_charge_logs")
 }
 
@@ -828,15 +944,17 @@ model SubscriptionCharges {
   total_charges_due Float
   updated_at String
 
+  rent_request_rel RentRequests? @relation("subscription_charges_rent_request_id", fields: [rent_request_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subscription_charge_logs_subscription_id SubscriptionChargeLogs[] @relation("subscription_charge_logs_subscription_id")
   @@map("subscription_charges")
 }
 
 model SupporterAgreementAcceptance {
+  id String @id @default(uuid())
   accepted_at String
   agreement_version String
   created_at String
   device_info String?
-  id String @id @default(uuid())
   ip_address String?
   status String
 
@@ -874,16 +992,17 @@ model SupporterInvites {
   status String
   temp_password String?
 
+  investor_portfolios_invite_id InvestorPortfolios[] @relation("investor_portfolios_invite_id")
   @@map("supporter_invites")
 }
 
 model SupporterReferrals {
+  id String @id @default(uuid())
   bonus_amount Float?
   bonus_credited Boolean?
   bonus_credited_at String?
   created_at String
   first_investment_at String?
-  id String @id @default(uuid())
 
   @@map("supporter_referrals")
 }
@@ -898,13 +1017,15 @@ model SupporterRoiPayments {
   roi_amount Float
   status String
 
+  rent_request_id String?
+  rent_request_rel RentRequests? @relation("supporter_roi_payments_rent_request_id", fields: [rent_request_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("supporter_roi_payments")
 }
 
 model SystemEvents {
+  id String @id @default(uuid())
   created_at String?
   event_type String
-  id String @id @default(uuid())
   metadata Json?
   processed Boolean?
   processed_at String?
@@ -916,11 +1037,11 @@ model SystemEvents {
 }
 
 model TenantAgreementAcceptance {
+  id String @id @default(uuid())
   accepted_at String
   agreement_version String
   created_at String
   device_info String?
-  id String @id @default(uuid())
   ip_address String?
   status String
 
@@ -957,6 +1078,7 @@ model TransactionApprovals {
   approved_by String
   transaction_id String?
 
+  transaction_rel LedgerTransactions? @relation("transaction_approvals_transaction_id", fields: [transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("transaction_approvals")
 }
 
@@ -977,6 +1099,8 @@ model UserLoanRepayments {
   id String @id @default(uuid())
   payment_method String
 
+  loan_id String?
+  loan_rel UserLoans? @relation("user_loan_repayments_loan_id", fields: [loan_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("user_loan_repayments")
 }
 
@@ -997,6 +1121,8 @@ model UserLoans {
   status String
   total_repayment Float
 
+  credit_request_details_loan_id CreditRequestDetails[] @relation("credit_request_details_loan_id")
+  user_loan_repayments_loan_id UserLoanRepayments[] @relation("user_loan_repayments_loan_id")
   @@map("user_loans")
 }
 
@@ -1028,6 +1154,8 @@ model UserReceipts {
   verified Boolean
   verified_at String?
 
+  receipt_number_id String?
+  receipt_number_rel ReceiptNumbers? @relation("user_receipts_receipt_number_id", fields: [receipt_number_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("user_receipts")
 }
 
@@ -1069,27 +1197,28 @@ model UserRoles {
 }
 
 model Vendors {
+  id String @id @default(uuid())
   active Boolean
   created_at String
   created_by String
-  id String @id @default(uuid())
   location String?
   name String
   phone String?
   pin String?
   pin_hash String?
 
+  receipt_numbers_vendor_id ReceiptNumbers[] @relation("receipt_numbers_vendor_id")
   @@map("vendors")
 }
 
 model VoidedLedgerEntries {
+  id String @id @default(uuid())
   account String?
   amount Float
   category String
   created_at String
   description String?
   direction String
-  id String @id @default(uuid())
   linked_party String?
   reference_id String?
   running_balance Float?
@@ -1154,6 +1283,8 @@ model Wishlists {
   created_at String
   id String @id @default(uuid())
 
+  product_id String?
+  product_rel Products? @relation("wishlists_product_id", fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   @@map("wishlists")
 }
 

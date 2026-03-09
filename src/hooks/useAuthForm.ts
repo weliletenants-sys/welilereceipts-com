@@ -267,6 +267,7 @@ export function useAuthForm() {
 
     // RPC lookup first: find real email linked to this phone (Gmail, Outlook, etc.)
     let rpcEmails: string[] = [];
+    /*
     try {
       const { data } = await Promise.race([
         supabase.rpc('get_email_by_phone', { phone_variants: [`0${last9}`, `256${last9}`, last9] }),
@@ -278,9 +279,11 @@ export function useAuthForm() {
     } catch {
       // RPC lookup failed — continue to direct profile lookup fallback
     }
+    */
 
     // Fallback: direct profile lookup by phone so phone->email login still works if RPC is slow/unavailable
     if (!rpcEmails.length) {
+      /*
       try {
         const { data: profileMatches } = await supabase
           .from('profiles')
@@ -297,6 +300,7 @@ export function useAuthForm() {
       } catch {
         // Ignore and continue with generated placeholder candidates
       }
+      */
     }
 
     if (rpcEmails.length) {

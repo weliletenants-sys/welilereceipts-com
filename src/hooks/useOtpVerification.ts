@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { fetchWithAuth } from '@/lib/apiClient';
 import { cleanPhoneNumber } from '@/lib/phoneUtils';
 
 export function useOtpVerification() {
@@ -13,17 +13,21 @@ export function useOtpVerification() {
     setOtpLoading(true);
     setOtpError(null);
     try {
-      const { data, error } = await supabase.functions.invoke('sms-otp', {
-        body: { action: 'send', phone: cleanPhoneNumber(phone) },
+      const response = await fetchWithAuth('/auth/sms-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'send', phone: cleanPhoneNumber(phone) }),
       });
-      if (error) {
-        // Try to extract error message from response context
-        const errMsg = error?.context ? 
-          await error.context.json().then((r: any) => r.error).catch(() => error.message) 
-          : error.message;
-        setOtpError(errMsg || 'Failed to send OTP');
+      
+      const data = await response.json().catch(() => ({}));
+      
+      if (!response.ok) {
+        setOtpError(data.message || data.error || 'Failed to send OTP');
         return false;
       }
+      
       if (data?.error) {
         setOtpError(data.error);
         return false;
@@ -43,16 +47,21 @@ export function useOtpVerification() {
     setOtpLoading(true);
     setOtpError(null);
     try {
-      const { data, error } = await supabase.functions.invoke('sms-otp', {
-        body: { action: 'verify', phone: cleanPhoneNumber(phone), otp },
+      const response = await fetchWithAuth('/auth/sms-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'verify', phone: cleanPhoneNumber(phone), otp }),
       });
-      if (error) {
-        const errMsg = error?.context ?
-          await error.context.json().then((r: any) => r.error).catch(() => error.message)
-          : error.message;
-        setOtpError(errMsg || 'Verification failed');
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setOtpError(data.message || data.error || 'Verification failed');
         return false;
       }
+
       if (data?.error) {
         setOtpError(data.error);
         return false;

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { extractEdgeFunctionError } from '@/lib/extractEdgeFunctionError';
 import { getPublicOrigin } from '@/lib/getPublicOrigin';
+import { fetchWithAuth } from '@/lib/apiClient';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -24,7 +25,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { usePhoneDuplicateCheck } from '@/hooks/usePhoneDuplicateCheck';
-import { useGeoLocation } from '@/hooks/useGeoLocation';
+import { useGPSLocation } from '@/hooks/useGPSLocation';
 import { Loader2 as LoaderIcon, Navigation } from 'lucide-react';
 
 const HOUSE_CATEGORIES = [
@@ -174,7 +175,7 @@ export function UnifiedRegistrationDialog({ open, onOpenChange, onSuccess }: Uni
   const [lc1Success, setLc1Success] = useState(false);
 
   // Location capture for landlord registrations
-  const { location: capturedLocation, loading: locationLoading, error: locationError, captureLocation } = useGeoLocation();
+  const { location: capturedLocation, loading: locationLoading, error: locationError, captureLocation } = useGPSLocation();
   const [propertyAddress, setPropertyAddress] = useState('');
   const [locationCaptured, setLocationCaptured] = useState(false);
 
@@ -267,8 +268,9 @@ export function UnifiedRegistrationDialog({ open, onOpenChange, onSuccess }: Uni
       // Auto-generate email from phone number
       const generatedEmail = `${formData.phone.replace(/\D/g, '')}@welile.user`;
 
-      const response = await supabase.functions.invoke('create-supporter-invite', {
-        body: { 
+      const response = await fetchWithAuth('/auth/invite', {
+        method: 'POST',
+        body: JSON.stringify({ 
           phone: formData.phone,
           password: formData.password,
           email: generatedEmail,
@@ -285,16 +287,17 @@ export function UnifiedRegistrationDialog({ open, onOpenChange, onSuccess }: Uni
           momoNumber: role === 'landlord' && momoNumber.trim() ? momoNumber.trim() : null,
           nwscMeter: role === 'landlord' && nwscMeter.trim() ? nwscMeter.trim() : null,
           uedclMeter: role === 'landlord' && uedclMeter.trim() ? uedclMeter.trim() : null,
-        },
+        }),
       });
 
-      if (response.error || response.data?.error) {
-        const errorMsg = await extractEdgeFunctionError(response, 'Failed to register user. Please try again.');
-        throw new Error(errorMsg);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to register user. Please try again.');
       }
 
       setCreatedInvite({
-        token: response.data.invite.activation_token,
+        token: data.invite.activation_token,
         fullName: formData.phone, // Use phone as identifier since no name yet
         password: formData.password,
         role: selectedType,
@@ -326,19 +329,18 @@ export function UnifiedRegistrationDialog({ open, onOpenChange, onSuccess }: Uni
     setLastError(null);
 
     try {
-      const { error } = await supabase
-        .from('lc1_chairpersons')
-        .insert({
+      const response = await fetchWithAuth('/auth/lc1', {
+        method: 'POST',
+        body: JSON.stringify({
           name: lc1Data.name.trim(),
           phone: lc1Data.phone.trim(),
           village: lc1Data.village.trim(),
-        });
+        }),
+      });
 
-      if (error) {
-        if (error.code === '23505') {
-          throw new Error('This LC1 chairman is already registered');
-        }
-        throw error;
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to register LC1');
       }
 
       setLc1Success(true);

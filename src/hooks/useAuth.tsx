@@ -38,46 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let isMounted = true;
-    let rolesFetched = false; // prevent duplicate role fetches
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (!isMounted) return;
-
-        setSession(session);
-        setUser(session?.user ?? null);
-
-        if (session?.user) {
-          setCachedSession(session.user.id, session.user.email || '', session.expires_at || 0);
-          
-          // Only fetch roles if initializeAuth hasn't already done it
-          if (!rolesFetched) {
-            rolesFetched = true;
-            fetchUserRoles(session.user.id, role, setRoles, setRole);
-          }
-
-        if (event === 'SIGNED_IN') {
-            // Trigger predictive prefetch — hydrate all offline stores
-            schedulePredictivePrefetch(session.user.id);
-
-            // Defer non-critical profile update — don't block login
-            setTimeout(() => {
-              supabase
-                .from('profiles')
-                .update({ last_active_at: new Date().toISOString() })
-                .eq('id', session.user.id)
-                .then(() => {});
-            }, 5000);
-          }
-        } else if (event === 'SIGNED_OUT') {
-          rolesFetched = false;
-          setRole(null);
-          setRoles([]);
-          clearSessionCache();
-          clearPrefetchFlag();
-        }
-      },
-    );
+    let rolesFetched = false;
 
     const initializeAuth = async () => {
       // Hard cap: loading MUST resolve within 8s no matter what
@@ -89,45 +50,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }, 8000);
 
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (!isMounted) return;
-
-        if (error) {
-          const msg = error.message?.toLowerCase() || '';
-          const isAuthError = msg.includes('refresh_token') || msg.includes('invalid') || msg.includes('expired') || msg.includes('not authenticated');
-          const isNetworkError = msg.includes('networkerror') || msg.includes('fetch') || msg.includes('network');
-          if (isAuthError) {
-            console.warn('[Auth] Auth token invalid, clearing:', error.message);
-            clearAllAuthStorage();
-            setSession(null);
+        const token = localStorage.getItem('welile_token');
+        const userStr = localStorage.getItem('welile_user');
+        
+        if (token && userStr) {
+          const userObj = JSON.parse(userStr);
+          if (isMounted) {
+            setUser(userObj);
+            setSession({ access_token: token, user: userObj } as any);
+          }
+          
+          if (!rolesFetched && isMounted) {
+             rolesFetched = true;
+             await fetchUserRoles(userObj.id, role, setRoles, setRole);
+          }
+          
+          setCachedSession(userObj.id, userObj.email || '', 0);
+          schedulePredictivePrefetch(userObj.id);
+        } else {
+          if (isMounted) {
             setUser(null);
+            setSession(null);
             setRole(null);
             setRoles([]);
-          } else if (isNetworkError) {
-            console.warn('[Auth] Network error during session restore — proceeding offline:', error.message);
-          } else {
-            console.warn('[Auth] Transient getSession error:', error.message);
           }
-          // Skip session state update on error — preserve existing state / cache
-        } else {
-          setSession(session);
-          setUser(session?.user ?? null);
-
-          if (session?.user) {
-            setCachedSession(session.user.id, session.user.email || '', session.expires_at || 0);
-            // Always fetch roles here — this is the authoritative fetch
-            rolesFetched = true;
-            const rolePromise = fetchUserRoles(session.user.id, role, setRoles, setRole);
-            const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 5000));
-            await Promise.race([rolePromise, timeoutPromise]);
-          } else if (!cachedSession) {
-            // Only clear cache if we had NO cached session — prevents
-            // transient getSession() nulls from signing out real users
-            clearSessionCache();
-          }
+          clearSessionCache();
+          clearPrefetchFlag();
+          rolesFetched = false;
         }
       } catch (err: any) {
-        console.warn('[Auth] Init failed (keeping session for retry):', err?.message);
+        console.warn('[Auth] Init failed:', err?.message);
+        clearAllAuthStorage();
+        if (isMounted) {
+          setUser(null);
+          setSession(null);
+          setRole(null);
+          setRoles([]);
+        }
       } finally {
         clearTimeout(forceLoadingOff);
         if (isMounted) setLoading(false);
@@ -136,9 +95,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     initializeAuth();
 
+    const handleAuthChange = () => {
+      rolesFetched = false; // force refetch if user changed in another tab or login flow
+      initializeAuth();
+    };
+
+    window.addEventListener('storage', handleAuthChange);
+    window.addEventListener('welile_auth_change', handleAuthChange);
+
     return () => {
       isMounted = false;
-      subscription.unsubscribe();
+      window.removeEventListener('storage', handleAuthChange);
+      window.removeEventListener('welile_auth_change', handleAuthChange);
     };
   }, []);
 

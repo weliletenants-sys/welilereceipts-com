@@ -3,35 +3,66 @@ import { lovable } from '@/integrations/lovable';
 import { getPublicOrigin } from '@/lib/getPublicOrigin';
 import type { AppRole } from './types';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+
 export async function signUp(email: string, password: string, fullName: string, phone: string, role: AppRole) {
-  const redirectUrl = `${window.location.origin}/`;
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: redirectUrl,
-      data: { full_name: fullName, phone, role },
-    },
-  });
-  return { error: error as Error | null };
+  try {
+    const res = await fetch(`${API_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, full_name: fullName, phone, role }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      return { error: new Error(data.error || 'Failed to sign up') };
+    }
+    return { error: null };
+  } catch (error: any) {
+    return { error: new Error(error.message || 'Network error during signup') };
+  }
 }
 
 export async function signUpWithoutRole(email: string, password: string, fullName: string, phone: string, referrerId?: string) {
-  const redirectUrl = `${window.location.origin}/`;
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: redirectUrl,
-      data: { full_name: fullName, phone, referrer_id: referrerId || null },
-    },
-  });
-  return { error: error as Error | null };
+  try {
+    const res = await fetch(`${API_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, full_name: fullName, phone, referrer_id: referrerId }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      return { error: new Error(data.error || 'Failed to sign up') };
+    }
+    return { error: null };
+  } catch (error: any) {
+    return { error: new Error(error.message || 'Network error during signup') };
+  }
 }
 
 export async function signIn(email: string, password: string) {
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  return { error: error as Error | null };
+  try {
+    const res = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      // Simulate Supabase "Invalid login credentials" message for UI compat
+      const errMsg = data.error === 'Invalid email or password' ? 'Invalid login credentials' : data.error;
+      return { error: new Error(errMsg || 'Failed to sign in') };
+    }
+    
+    // Store our new custom JWT
+    if (data.token) {
+      localStorage.setItem('welile_token', data.token);
+      localStorage.setItem('welile_user', JSON.stringify(data.user));
+      window.dispatchEvent(new Event('welile_auth_change'));
+    }
+    return { error: null };
+  } catch (error: any) {
+    return { error: new Error('Invalid login credentials') };
+  }
 }
 
 async function attemptOAuth(provider: 'google' | 'apple', redirectUri: string) {
@@ -118,7 +149,14 @@ export async function signInWithApple() {
 
 export async function signOutUser(userId: string | undefined) {
   // Activity log insert stubbed for performance
-  await supabase.auth.signOut();
+  localStorage.removeItem('welile_token');
+  localStorage.removeItem('welile_user');
+  window.dispatchEvent(new Event('welile_auth_change'));
+
+  // Best-effort cleanup for any lingering supabase state
+  try {
+    await supabase.auth.signOut();
+  } catch(e) {}
 }
 
 export async function resetPassword(email: string) {

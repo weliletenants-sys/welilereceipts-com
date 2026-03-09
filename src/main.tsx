@@ -69,9 +69,9 @@ const loadApp = async () => {
     setTimeout(clearAppCaches, 2000);
   }
   try {
-    // Hard timeout: if imports hang >12s, reject so we show error UI
+    // Hard timeout: if imports hang >60s, reject so we show error UI
     const importTimeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Import timeout')), 12000)
+      setTimeout(() => reject(new Error('Import timeout')), 60000)
     );
     const importApp = Promise.all([
       import("./index.css"),
@@ -82,13 +82,13 @@ const loadApp = async () => {
 
     createRoot(root).render(<App />);
     schedulePreviewBlankPageGuard();
-  } catch (err) {
+  } catch (err: any) {
     console.error('[Main] App load failed:', err);
-    showErrorUI();
+    showErrorUI(err.message || String(err));
   }
 };
 
-function showErrorUI() {
+function showErrorUI(realError?: string) {
   root.textContent = '';
   const container = document.createElement('div');
   container.style.cssText = 'min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f8fafc;gap:16px;padding:24px;text-align:center';
@@ -105,8 +105,8 @@ function showErrorUI() {
   heading.style.cssText = 'font-size:18px;font-weight:600;color:#1f2937;margin:0';
 
   const msg = document.createElement('p');
-  msg.textContent = 'Check your internet connection and try again.';
-  msg.style.cssText = 'font-size:14px;color:#6b7280;margin:0;max-width:280px';
+  msg.textContent = realError ? `Fatal UI Crash: ${realError}` : 'Check your internet connection and try again.';
+  msg.style.cssText = 'font-size:14px;color:#ef4444;margin:0;max-width:400px;word-break:break-all;font-family:monospace;';
 
   const btn = document.createElement('button');
   btn.textContent = 'Tap to Retry';
