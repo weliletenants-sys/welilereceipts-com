@@ -29,27 +29,26 @@ export const register = async (req: Request, res: Response) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // In Supabase, the user table is "auth.users" and the business logic table is "public.profiles".
-    // Since we are migrating the exact Supabase database to AWS RDS without schema changes,
-    // we use a RAW SQL query to insert into the existing "auth.users" table structure.
-    
     // Create UUID for the new user
     const userId = crypto.randomUUID();
 
-    // Insert into auth.users (Supabase's hidden auth table)
-    await prisma.$executeRaw`
-      INSERT INTO auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at)
-      VALUES (${userId}::uuid, '00000000-0000-0000-0000-000000000000'::uuid, 'authenticated', 'authenticated', ${email}, ${hashedPassword}, now(), now(), now())
-    `;
-
-    // Insert into public.profiles (Supabase's trigger usually does this, but we'll manually ensure it in Node)
-    await prisma.$executeRaw`
-      INSERT INTO public.profiles (id, email, full_name, phone, created_at, updated_at, is_frozen, verified)
-      VALUES (${userId}::varchar, ${email}, ${full_name}, ${phone}, now()::text, now()::text, false, false)
-    `;
+    await prisma.profiles.create({
+      data: {
+        id: userId,
+        email,
+        full_name,
+        phone,
+        password_hash: hashedPassword,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        is_frozen: false,
+        verified: false,
+        rent_discount_active: false
+      }
+    });
 
     return res.status(201).json({ 
-      message: 'Registration successful! The existing auth.users schema is preserved.',
+      message: 'Registration successful!',
       user: { id: userId, email, full_name }
     });
   } catch (error: any) {
@@ -71,38 +70,29 @@ export const login = async (req: Request, res: Response) => {
     const parsedData = loginSchema.parse(req.body);
     const { email, password } = parsedData;
 
-    // Fetch user from the hidden auth.users table instead of Prisma profiles
-    const authUsers: any[] = await prisma.$queryRaw`
-      SELECT id, encrypted_password FROM auth.users WHERE email = ${email} LIMIT 1
-    `;
+    const profile = await prisma.profiles.findFirst({
+      where: { email }
+    });
 
-    if (authUsers.length === 0) {
+    if (!profile || !profile.password_hash) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    const authUser = authUsers[0];
-
-    // Supabase pg_crypto hashes format nicely to standard bcrypt
-    const passwordMatch = await bcrypt.compare(password, authUser.encrypted_password);
+    const passwordMatch = await bcrypt.compare(password, profile.password_hash);
 
     if (!passwordMatch) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    // Now fetch the public profile data
-    const profile = await prisma.profiles.findFirst({
-      where: { id: authUser.id }
-    });
-
-    const token = generateToken(authUser.id, 'tenant'); // default role placeholder
+    const token = generateToken(profile.id, 'tenant'); // default role placeholder
 
     return res.status(200).json({
       message: 'Login successful',
       token,
       user: {
-        id: authUser.id,
+        id: profile.id,
         email: email,
-        full_name: profile?.full_name || ''
+        full_name: profile.full_name
       }
     });
   } catch (error: any) {
