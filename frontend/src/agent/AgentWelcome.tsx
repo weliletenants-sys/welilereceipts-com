@@ -52,10 +52,7 @@ export default function AgentWelcome() {
 
   return (
     <div className="min-h-screen bg-[#351A82] sm:p-4 flex justify-center items-center relative overflow-hidden text-white font-sans">
-      <div className="w-full max-w-[420px] h-[100dvh] sm:h-[880px] max-h-screen bg-[#351A82] relative flex flex-col sm:rounded-[40px] shadow-2xl overflow-hidden z-10 sm:border-[14px] border-gray-900 border-0">
-        
-        {/* Fake iPhone Notch */}
-        <div className="hidden sm:block absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[30px] bg-gray-900 rounded-b-3xl z-50"></div>
+      <div className="w-full min-h-screen bg-[#351A82] relative flex flex-col shadow-2xl overflow-hidden z-10">
 
         <div className="flex-1 flex flex-col px-6 pt-16 pb-10 relative z-20 h-full">
           

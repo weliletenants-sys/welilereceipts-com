@@ -31,9 +31,7 @@ export default function RoleSelection() {
         </svg>
       </div>
 
-      <div className="w-full max-w-[420px] h-[100dvh] sm:h-[880px] max-h-screen bg-[#F8F9FA] relative flex flex-col sm:rounded-[40px] shadow-2xl overflow-hidden z-10 border-[12px] border-gray-900 sm:border-[14px]">
-        {/* Fake iPhone Notch */}
-        <div className="hidden sm:block absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[30px] bg-gray-900 rounded-b-3xl z-50"></div>
+      <div className="w-full min-h-screen bg-[#F8F9FA] relative flex flex-col shadow-2xl overflow-hidden z-10">
 
         <div className="py-12 px-6 flex flex-col h-full bg-gradient-to-b from-[#E9DDFD] to-[#F8F9FA]">
           <div className="mt-8 mb-10 text-center">

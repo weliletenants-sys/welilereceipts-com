@@ -15,10 +15,7 @@ export default function LandingPage() {
         </svg>
       </div>
 
-      <div className="w-full max-w-[420px] h-[100dvh] sm:h-[880px] max-h-screen bg-gradient-to-b from-[#673AB7] to-[#512DA8] relative flex flex-col sm:rounded-[40px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden z-10 border-[12px] border-gray-900 sm:border-[14px]">
-        
-        {/* Fake iPhone Notch */}
-        <div className="hidden sm:block absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[30px] bg-gray-900 rounded-b-3xl z-50"></div>
+      <div className="w-full min-h-screen bg-gradient-to-b from-[#673AB7] to-[#512DA8] relative flex flex-col overflow-hidden z-10">
 
         <div className="flex-1 overflow-y-auto px-6 pt-20 pb-12 relative z-10 flex flex-col justify-between scrollbar-hide">
           

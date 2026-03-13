@@ -73,9 +73,7 @@ export default function AgentKYC() {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] sm:p-4 flex justify-center mt-0 sm:mt-4 relative">
-      <div className="w-full max-w-[420px] h-[100dvh] sm:h-[880px] max-h-screen bg-white relative flex flex-col sm:rounded-[40px] shadow-2xl overflow-hidden z-10 border-[12px] border-gray-900 sm:border-[14px]">
-        
-        <div className="hidden sm:block absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[30px] bg-gray-900 rounded-b-3xl z-50 px-2 py-0 border-none m-0 pointer-events-none" />
+      <div className="w-full min-h-screen bg-white relative flex flex-col shadow-2xl overflow-hidden z-10">
 
         {/* Header */}
         <div className="pt-14 px-6 pb-4 bg-white border-b border-gray-100 flex items-center justify-between shrink-0">

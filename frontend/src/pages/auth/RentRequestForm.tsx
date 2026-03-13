@@ -32,7 +32,7 @@ export default function RentRequestForm() {
     <div className="min-h-screen bg-[#111827] sm:p-4 flex justify-center items-center relative overflow-hidden font-sans">
       
       {/* Phone container */}
-      <div className="w-full max-w-[420px] h-[100dvh] sm:h-[880px] max-h-screen bg-white relative flex flex-col sm:rounded-[32px] overflow-hidden z-10 border-8 border-[#1C2434] sm:border-[16px]">
+      <div className="w-full min-h-screen bg-white relative flex flex-col overflow-hidden z-10">
         
         {/* Header Section */}
         <div className="pt-12 pb-4 px-6 flex items-center justify-between bg-white relative z-20">

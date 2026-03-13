@@ -22,7 +22,7 @@ Once the tables are created, we inject the 5,000+ users and millions of rows usi
 2. This will insert all rows cleanly because Prisma has already built the tables.
 
 ### 3. Application Re-start
-Ensure all backend services are using the new `DATABASE_URL` and restart the NestJS server. Because you recently moved to your own OTP authentication, users will simply request an OTP and be seamlessly logged back into their profiles (since all profile UUIDs are preserved).
+Ensure all backend services are using the new `DATABASE_URL` and restart the Express server. Because you recently moved to your own OTP authentication, users will simply request an OTP and be seamlessly logged back into their profiles (since all profile UUIDs are preserved).
 
 ## Verification Plan
 
@@ -31,6 +31,6 @@ Ensure all backend services are using the new `DATABASE_URL` and restart the Nes
 - Run `npx prisma validate` to ensure the AWS database is perfectly aligned with Prisma.
 
 ### Manual Verification
-- Start the NestJS backend and the Vite frontend natively (`npm run start:dev` and `npm run dev`).
+- Start the Express backend and the Vite frontend natively (`npm run start:dev` and `npm run dev`).
 - Log in using an OTP on the frontend.
 - Verify wallet balances, rent requests, and agent leaderboards show up perfectly.

@@ -1,124 +1,83 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowUpRight, Menu } from 'lucide-react';
-
-// Context removed intentionally to fix TS errors
-
-// Components
 import DashboardHeader from './components/DashboardHeader';
-import CreditAccessCard from './components/CreditAccessCard';
-import SubscriptionStatusCard from './components/SubscriptionStatusCard';
 import WalletCard from './components/WalletCard';
-import TenantMenuDrawer from './components/TenantMenuDrawer';
+import RentProgressCard from './components/RentProgressCard';
+import RecentActivitiesCard from './components/RecentActivitiesCard';
+import TenantBottomNav from './components/TenantBottomNav';
 import FullScreenWalletSheet from './components/FullScreenWalletSheet';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function TenantDashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // --- MOCK DATA LAYER ---
-  const [user] = useState({
-    fullName: 'Jane Doe',
-    role: 'tenant',
-    isVerified: true,
-    avatarUrl: ''
-  });
-
   const [wallet] = useState({
-    balance: 55000
+    balance: 24000
   });
 
-  const [creditLimit] = useState(2000000);
-
-  const [activeRent] = useState<{
-    status: 'pending' | 'approved' | 'funded' | 'disbursed' | 'completed';
-    rentFinanced: number;
-    totalRepayment: number;
-    dailyRepayment: number;
-    amountPaid: number;
-    daysRemaining: number;
-    landlord: string;
-  }>({
-    status: 'disbursed',
-    rentFinanced: 450000,
-    totalRepayment: 470000,
-    dailyRepayment: 15667,
-    amountPaid: 120000,
-    daysRemaining: 23,
-    landlord: 'Okello Properties'
+  const [activeRent] = useState({
+    amountPaid: 123000,
+    totalRent: 185000,
+    daysLeft: 8,
+    remainingAmount: 65000,
+    currentMonth: 'June 2024'
   });
 
   // --- STATE LAYER ---
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isWalletOpen, setIsWalletOpen] = useState(false);
 
-  // --- ACTIONS ---
-  const handleRequestRent = () => {
-    // In a real app, check useTenantAgreement() here first
-    navigate('/tenant-agreement');
-  };
-
   return (
-    <>
-      {/* Offline Status - Hidden per request, but the hook is active */}
-      {/* {isOffline && <div className="bg-yellow-500...">Offline Mode</div>} */}
-
-      <div className="flex flex-col gap-6 pb-24">
+    <div className="bg-[#f7f6f8] min-h-screen font-sans text-slate-900">
+      <div className="w-full bg-white min-h-screen flex flex-col">
         
-        {/* Top Profile Header */}
+        {/* Header Section */}
         <DashboardHeader 
-          user={user} 
+          user={{
+            fullName: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : 'Alex Johnson',
+            role: 'Tenant',
+            isVerified: true,
+            avatarUrl: ''
+          }} 
           onAvatarClick={() => navigate('/settings')} 
+          onNotificationClick={() => console.log('Notifications')}
         />
 
-        {/* Dynamic Credit Limit */}
-        <CreditAccessCard creditLimit={creditLimit} />
+        <main className="flex-1 p-4 space-y-6 pb-24 border-0">
+          
+          {/* Wallet Card */}
+          <WalletCard 
+            balance={wallet.balance} 
+            onDeposit={() => setIsWalletOpen(true)}
+            onWithdraw={() => setIsWalletOpen(true)}
+            onTransfer={() => setIsWalletOpen(true)}
+          />
 
-        {/* Subscription Tracking (Hero Card) */}
-        <SubscriptionStatusCard 
-          activeRent={activeRent}
-          daysRemaining={activeRent.daysRemaining}
-          amountPaid={activeRent.amountPaid}
-          totalRepayment={activeRent.totalRepayment}
+          {/* Rent Progress Section */}
+          <RentProgressCard 
+            amountPaid={activeRent.amountPaid}
+            totalRent={activeRent.totalRent}
+            daysLeft={activeRent.daysLeft}
+            remainingAmount={activeRent.remainingAmount}
+            currentMonth={activeRent.currentMonth}
+          />
+
+          {/* Quick Actions / Recent */}
+          <RecentActivitiesCard />
+
+        </main>
+
+        {/* Bottom Navigation */}
+        <TenantBottomNav />
+
+        {/* Action Sheets */}
+        <FullScreenWalletSheet 
+          isOpen={isWalletOpen} 
+          onClose={() => setIsWalletOpen(false)} 
+          balance={wallet.balance}
         />
-
-        {/* Purple Wallet Card */}
-        <WalletCard balance={wallet.balance} onClick={() => setIsWalletOpen(true)} />
-
-        {/* Two Main Action Buttons */}
-        <div className="grid grid-cols-2 gap-4 mt-2">
-          <button 
-            onClick={handleRequestRent}
-            className="bg-[#512DA8] border border-[#482D98] text-white rounded-[1.5rem] p-4 flex flex-col items-center justify-center shadow-md active:scale-95 transition"
-          >
-            <span className="text-xs font-bold uppercase tracking-wider mb-1 opacity-90">Request</span>
-            <div className="flex items-center gap-1">
-              <span className="font-bold text-sm">Rent</span>
-              <ArrowUpRight size={16} strokeWidth={3} />
-            </div>
-          </button>
-
-          <button 
-            onClick={() => setIsMenuOpen(true)}
-            className="bg-gradient-to-b from-gray-100 to-gray-200 border border-gray-300 text-gray-700 rounded-[1.5rem] p-4 flex flex-col items-center justify-center shadow-sm active:scale-95 transition hover:shadow-md"
-          >
-            <Menu size={24} className="mb-1 text-gray-600" />
-            <span className="text-xs font-bold uppercase tracking-wider">Menu</span>
-          </button>
-        </div>
-
       </div>
-
-      {/* Sheets and Drawers */}
-      <TenantMenuDrawer 
-        isOpen={isMenuOpen} 
-        onClose={() => setIsMenuOpen(false)} 
-      />
-
-      <FullScreenWalletSheet 
-        isOpen={isWalletOpen} 
-        onClose={() => setIsWalletOpen(false)} 
-        balance={wallet.balance}
-      />
-    </>
+    </div>
   );
 }
