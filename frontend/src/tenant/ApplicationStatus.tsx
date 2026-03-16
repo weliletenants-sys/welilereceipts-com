@@ -1,6 +1,8 @@
 import { Clock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function ApplicationStatus() {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-[#F8F9FA] sm:p-4 flex justify-center items-center relative overflow-hidden">
       <div className="w-full min-h-screen bg-white relative flex flex-col shadow-2xl overflow-hidden z-10">
@@ -23,8 +25,16 @@ export default function ApplicationStatus() {
             Your application is pending approval. Our verification team is reviewing your information and will contact you shortly if we need anything else.
           </p>
 
-          <div className="mt-auto w-full text-center">
-             <p className="text-sm text-gray-400 font-medium">Please wait for notification before proceeding.</p>
+          <div className="mt-auto w-full text-center pb-8">
+             <p className="text-sm text-gray-400 font-medium mb-6">Please wait for notification before proceeding.</p>
+             
+             {/* Developer/Debug Button to simulate approval */}
+             <button 
+               onClick={() => navigate('/dashboard')}
+               className="text-xs text-purple-600 bg-purple-50 px-4 py-2 rounded-full font-bold hover:bg-purple-100 transition"
+             >
+               (Dev) Simulate Approval &rarr; Go to Dashboard
+             </button>
           </div>
 
         </div>

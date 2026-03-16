@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Routes, Route, useLocation } from 'react-router-dom';
 import AgentHeader from './components/AgentHeader';
 import CommissionWalletCard from './components/CommissionWalletCard';
 import RecruitmentProgressCard from './components/RecruitmentProgressCard';
@@ -13,12 +13,25 @@ import AgentRegisterUserDialog from './components/dialogs/AgentRegisterUserDialo
 import { useOfflineAgentDashboard } from '../hooks/useOfflineAgentDashboard';
 import { ShieldAlert, Clock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import AgentSubAgents from './AgentSubAgents';
+import AgentClients from './AgentClients';
+import AgentEarnings from './AgentEarnings';
+import AgentSettings from './AgentSettings';
 
 export default function AgentDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isOnline } = useOfflineAgentDashboard();
   const { user } = useAuth();
   
+  // Use a white background if we're on the clients or earnings page to match the design better
+  const isClientsPage = location.pathname === '/clients' || location.pathname === '/dashboard/clients';
+  const isEarningsPage = location.pathname === '/earnings' || location.pathname === '/dashboard/earnings';
+  const isSettingsPage = location.pathname === '/settings' || location.pathname === '/dashboard/settings';
+  
+  const hideHeader = location.pathname.includes('/sub-agents') || isClientsPage || isEarningsPage || isSettingsPage;
+  const bgClass = (isClientsPage || isEarningsPage || isSettingsPage) ? "bg-white" : "bg-[#f7f6f8]";
+
   // Dialog States
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [isInvestModalOpen, setIsInvestModalOpen] = useState(false);
@@ -31,21 +44,26 @@ export default function AgentDashboard() {
   const [kycStatus] = useState<'NONE' | 'UNDER_REVIEW' | 'APPROVED'>('NONE');
   
   return (
-    <div className="bg-[#f7f6f8] min-h-screen flex flex-col font-sans text-gray-900 pb-24">
+    <div className={`${bgClass} min-h-screen flex flex-col font-sans text-gray-900 pb-24`}>
       
       {/* 1. Header */}
-      <AgentHeader 
-        user={{
-          fullName: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : 'Agent Name',
-          role: 'AGENT',
-          avatarUrl: ''
-        }}
-        onAvatarClick={() => navigate('/settings')}
-        onNotificationClick={() => console.log('Notifications clicked')}
-      />
+      {!hideHeader && (
+        <AgentHeader 
+          user={{
+            fullName: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : 'Agent Name',
+            role: 'AGENT',
+            avatarUrl: ''
+          }}
+          onAvatarClick={() => navigate('/settings')}
+          onNotificationClick={() => console.log('Notifications clicked')}
+        />
+      )}
 
       <main className="flex-1">
-        {/* Offline Alert */}
+        <Routes>
+          <Route path="/" element={
+            <>
+              {/* Offline Alert */}
         {!isOnline && (
           <div className="mx-4 mt-4 bg-amber-50 text-amber-800 text-xs py-2 px-4 text-center font-medium rounded-xl border border-amber-200 shadow-sm animate-pulse">
             You are currently offline. Field operations may be restricted.
@@ -89,10 +107,19 @@ export default function AgentDashboard() {
           conversionRate={64}
         />
 
-        {/* 4. Agent Tools */}
-        <AgentToolsGrid 
-          onNewClientClick={() => setIsRegisterOpen(true)}
-        />
+              {/* 4. Agent Tools */}
+              <AgentToolsGrid 
+                onNewClientClick={() => setIsRegisterOpen(true)}
+                onSubAgentsClick={() => navigate('/dashboard/sub-agents')}
+              />
+            </>
+          } />
+          
+          <Route path="/clients" element={<AgentClients />} />
+          <Route path="/earnings" element={<AgentEarnings />} />
+          <Route path="/settings" element={<AgentSettings />} />
+          <Route path="/sub-agents" element={<AgentSubAgents />} />
+        </Routes>
       </main>
 
       {/* 5. Bottom Navigation */}

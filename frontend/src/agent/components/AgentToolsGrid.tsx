@@ -1,4 +1,4 @@
-import { UserPlus, ReceiptText, LineChart, HelpCircle } from 'lucide-react';
+import { UserPlus, Users, LineChart, HelpCircle } from 'lucide-react';
 
 interface ToolItemProps {
   icon: React.ReactNode;
@@ -22,9 +22,10 @@ function ToolItem({ icon, label, onClick }: ToolItemProps) {
 
 interface AgentToolsGridProps {
   onNewClientClick?: () => void;
+  onSubAgentsClick?: () => void;
 }
 
-export default function AgentToolsGrid({ onNewClientClick }: AgentToolsGridProps) {
+export default function AgentToolsGrid({ onNewClientClick, onSubAgentsClick }: AgentToolsGridProps) {
   return (
     <section className="px-4 py-6">
       <h3 className="text-lg font-bold mb-4 px-1 text-gray-900">Agent Tools</h3>
@@ -37,9 +38,9 @@ export default function AgentToolsGrid({ onNewClientClick }: AgentToolsGridProps
         />
         
         <ToolItem 
-          icon={<ReceiptText size={24} strokeWidth={2} />} 
-          label="Invoices" 
-          onClick={() => console.log('Invoices Clicked')}
+          icon={<Users size={24} strokeWidth={2} />} 
+          label="Sub Agents" 
+          onClick={onSubAgentsClick || (() => console.log('Sub Agents Clicked'))}
         />
         
         <ToolItem 

@@ -1,4 +1,4 @@
-import { Home, Users, Search, Settings } from 'lucide-react';
+import { Home, Users, Wallet, Settings } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function AgentBottomNav() {
@@ -7,9 +7,9 @@ export default function AgentBottomNav() {
 
   const navItems = [
     { icon: <Home size={24} />, label: 'Home', path: '/dashboard' },
-    { icon: <Users size={24} />, label: 'Clients', path: '/clients' },
-    { icon: <Search size={24} />, label: 'Tracking', path: '/tracking' },
-    { icon: <Settings size={24} />, label: 'Settings', path: '/settings' },
+    { icon: <Users size={24} />, label: 'Clients', path: '/dashboard/clients' },
+    { icon: <Wallet size={24} />, label: 'Earnings', path: '/dashboard/earnings' },
+    { icon: <Settings size={24} />, label: 'Settings', path: '/dashboard/settings' },
   ];
 
   return (
