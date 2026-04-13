@@ -1,0 +1,2518 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AgentAdvanceLedger {
+  advance_id String
+  amount_deducted Float
+  closing_balance Float
+  created_at String
+  date String
+  deduction_status String
+  id String @id @default(uuid())
+  interest_accrued Float
+  opening_balance Float
+
+  @@map("agent_advance_ledger")
+}
+
+model AgentAdvanceTopups {
+  advance_id String
+  amount Float
+  created_at String
+  id String @id @default(uuid())
+  monthly_rate Float
+  topped_up_by String
+
+  @@map("agent_advance_topups")
+}
+
+model AgentAdvances {
+  access_fee Float?
+  access_fee_collected Float?
+  access_fee_status String?
+  agent_id String
+  created_at String
+  cycle_days Float
+  daily_rate Float
+  expires_at String
+  id String @id @default(uuid())
+  issued_at String
+  issued_by String
+  monthly_rate Float
+  outstanding_balance Float
+  principal Float
+  registration_fee Float?
+  status String
+  updated_at String
+
+  @@map("agent_advances")
+}
+
+model AgentCollectionStreaks {
+  agent_id String
+  badges Json?
+  current_streak Float?
+  id String @id @default(uuid())
+  last_collection_date String?
+  longest_streak Float?
+  streak_multiplier Float?
+  total_badges Float?
+  updated_at String?
+
+  @@map("agent_collection_streaks")
+}
+
+model AgentCollections {
+  agent_id String
+  amount Float
+  created_at String
+  float_after Float
+  float_before Float
+  id String @id @default(uuid())
+  location_name String?
+  momo_payer_name String?
+  momo_phone String?
+  momo_provider String?
+  momo_transaction_id String?
+  notes String?
+  payment_method String
+  sms_sent_agent Boolean?
+  sms_sent_tenant Boolean?
+  tenant_id String
+  token_id String?
+  tracking_id String?
+  visit_id String?
+
+  @@map("agent_collections")
+}
+
+model AgentCommissionPayouts {
+  agent_id String
+  amount Float
+  created_at String
+  id String @id @default(uuid())
+  mobile_money_number String
+  mobile_money_provider String
+  processed_at String?
+  processed_by String?
+  rejection_reason String?
+  requested_at String
+  status String
+  transaction_id String?
+  updated_at String
+
+  @@map("agent_commission_payouts")
+}
+
+model AgentDeliveryConfirmations {
+  agent_id String
+  confirmation_type String
+  confirmed_at String
+  created_at String
+  disbursement_id String
+  id String @id @default(uuid())
+  landlord_signature_url String?
+  latitude Float?
+  location_accuracy Float?
+  longitude Float?
+  notes String?
+  photo_urls String?
+  rent_request_id String
+
+  @@map("agent_delivery_confirmations")
+}
+
+model AgentEarnings {
+  agent_id String
+  amount Float
+  created_at String
+  description String?
+  earning_type String
+  id String @id @default(uuid())
+  rent_request_id String?
+  source_user_id String?
+
+  @@map("agent_earnings")
+}
+
+model AgentEscalations {
+  agent_id String
+  created_at String
+  description String?
+  escalation_type String
+  id String @id @default(uuid())
+  metadata Json?
+  resolution_notes String?
+  resolved_at String?
+  resolved_by String?
+  severity String
+  status String
+  tenant_id String?
+  title String
+  updated_at String
+
+  @@map("agent_escalations")
+}
+
+model AgentFloatFunding {
+  agent_id String
+  amount Float
+  bank_name String?
+  bank_reference String?
+  created_at String
+  funded_by String?
+  id String @id @default(uuid())
+  notes String?
+  status String
+
+  @@map("agent_float_funding")
+}
+
+model AgentFloatLimits {
+  agent_id String
+  assigned_by String?
+  cash_on_hand Float?
+  collected_today Float
+  created_at String
+  critical_threshold_pct Float?
+  daily_txn_limit Float?
+  float_limit Float
+  id String @id @default(uuid())
+  is_paused Boolean?
+  last_reset_date String
+  low_threshold_pct Float?
+  updated_at String
+
+  @@map("agent_float_limits")
+}
+
+model AgentFloatWithdrawals {
+  agent_id String
+  agent_latitude Float?
+  agent_location_accuracy Float?
+  agent_longitude Float?
+  agent_ops_notes String?
+  agent_ops_reviewed_at String?
+  agent_ops_reviewed_by String?
+  amount Float
+  created_at String
+  gps_distance_meters Float?
+  gps_match Boolean?
+  id String @id @default(uuid())
+  landlord_id String
+  landlord_latitude Float?
+  landlord_location_accuracy Float?
+  landlord_longitude Float?
+  landlord_name String
+  landlord_phone String
+  manager_notes String?
+  manager_reviewed_at String?
+  manager_reviewed_by String?
+  mobile_money_provider String
+  notes String?
+  property_latitude Float?
+  property_longitude Float?
+  receipt_photo_urls String?
+  rent_request_id String
+  status String
+  tenant_id String?
+  transaction_id String?
+  updated_at String
+
+  @@map("agent_float_withdrawals")
+}
+
+model AgentFormTokens {
+  agent_id String
+  created_at String
+  expires_at String
+  id String @id @default(uuid())
+  is_active Boolean
+  max_uses Float
+  token String
+  uses_count Float
+
+  @@map("agent_form_tokens")
+}
+
+model AgentGoals {
+  agent_id String
+  created_at String
+  goal_month String
+  id String @id @default(uuid())
+  notes String?
+  target_activations Float?
+  target_registrations Float
+  updated_at String
+
+  @@map("agent_goals")
+}
+
+model AgentIncentiveBonuses {
+  agent_id String
+  amount Float?
+  awarded_at String?
+  bonus_type String
+  created_at String?
+  description String?
+  id String @id @default(uuid())
+  metadata Json?
+
+  @@map("agent_incentive_bonuses")
+}
+
+model AgentLandlordAssignments {
+  agent_id String
+  assigned_at String
+  created_at String
+  id String @id @default(uuid())
+  landlord_id String
+  rent_request_id String?
+  status String
+
+  @@map("agent_landlord_assignments")
+}
+
+model AgentLandlordFloat {
+  agent_id String
+  balance Float
+  created_at String
+  id String @id @default(uuid())
+  total_funded Float
+  total_paid_out Float
+  updated_at String
+
+  @@map("agent_landlord_float")
+}
+
+model AgentLandlordPayouts {
+  agent_id String?
+  amount Float
+  cfo_approved_at String?
+  cfo_approved_by String?
+  cfo_notes String?
+  created_at String
+  gps_distance_meters Float?
+  gps_match Boolean?
+  id String @id @default(uuid())
+  landlord_id String
+  landlord_name String
+  landlord_ops_approved_at String?
+  landlord_ops_approved_by String?
+  landlord_ops_notes String?
+  landlord_phone String
+  latitude Float?
+  location_accuracy Float?
+  longitude Float?
+  mobile_money_provider String
+  notes String?
+  property_latitude Float?
+  property_longitude Float?
+  receipt_photo_urls String?
+  rejection_reason String?
+  rent_request_id String
+  status String
+  tenant_id String
+  transaction_id String?
+  updated_at String
+
+  @@map("agent_landlord_payouts")
+}
+
+model AgentRebalanceRecords {
+  agent_id String
+  amount Float
+  approved_by String?
+  created_at String
+  direction String
+  id String @id @default(uuid())
+  method String?
+  reference_id String?
+
+  @@map("agent_rebalance_records")
+}
+
+model AgentReceipts {
+  agent_id String
+  amount Float
+  created_at String
+  id String @id @default(uuid())
+  notes String?
+  payer_name String
+  payer_phone String
+  payment_method String
+  receipt_image_url String?
+  transaction_id String?
+
+  @@map("agent_receipts")
+}
+
+model AgentSubagents {
+  created_at String
+  id String @id @default(uuid())
+  parent_agent_id String
+  rejection_reason String?
+  source String
+  status String
+  sub_agent_id String
+  verified_at String?
+  verified_by String?
+
+  @@map("agent_subagents")
+}
+
+model AgentTasks {
+  agent_id String
+  assigned_by String?
+  completed_at String?
+  completion_latitude Float?
+  completion_longitude Float?
+  completion_notes String?
+  created_at String
+  description String?
+  due_date String?
+  gps_required Boolean?
+  id String @id @default(uuid())
+  priority String
+  rent_request_id String?
+  status String
+  task_type String
+  tenant_id String?
+  title String
+  updated_at String
+
+  @@map("agent_tasks")
+}
+
+model AgentVisits {
+  accuracy Float?
+  agent_id String
+  checked_in_at String
+  created_at String
+  id String @id @default(uuid())
+  latitude Float
+  location_name String?
+  longitude Float
+  tenant_id String
+
+  @@map("agent_visits")
+}
+
+model AiChatMessages {
+  content String
+  created_at String
+  id String @id @default(uuid())
+  role String
+  user_id String
+
+  @@map("ai_chat_messages")
+}
+
+model AngelPoolConfig {
+  id String @id @default(uuid())
+  pool_equity_percent Float
+  price_per_share Float
+  total_pool_ugx Float
+  total_shares Float
+  updated_at String?
+  updated_by String?
+
+  @@map("angel_pool_config")
+}
+
+model AngelPoolInvestments {
+  agent_id String?
+  amount Float
+  company_ownership_percent Float
+  created_at String
+  id String @id @default(uuid())
+  investment_reference String?
+  investor_id String
+  payment_method String?
+  pool_ownership_percent Float
+  reference_id String?
+  shares Float
+  status String
+  transaction_group_id String?
+
+  @@map("angel_pool_investments")
+}
+
+model AuditLogs {
+  action String?
+  action_type String
+  created_at String?
+  id String @id @default(uuid())
+  metadata Json?
+  record_id String?
+  table_name String?
+  user_id String?
+
+  @@map("audit_logs")
+}
+
+model CartItems {
+  created_at String
+  id String @id @default(uuid())
+  product_id String
+  quantity Float
+  updated_at String
+  user_id String
+
+  @@map("cart_items")
+}
+
+model CashoutAgents {
+  agent_id String
+  assigned_by String
+  created_at String
+  current_queue_count Float?
+  handles_airtel Boolean?
+  handles_bank Boolean
+  handles_cash Boolean
+  handles_mtn Boolean?
+  id String @id @default(uuid())
+  is_active Boolean
+  label String?
+  max_daily_payouts Float?
+  priority_threshold Float?
+  updated_at String
+
+  @@map("cashout_agents")
+}
+
+model CfoThresholdAlerts {
+  acknowledged Boolean?
+  acknowledged_at String?
+  acknowledged_by String?
+  alert_type String
+  created_at String
+  current_value Float?
+  description String?
+  id String @id @default(uuid())
+  severity String
+  threshold_value Float?
+  title String
+
+  @@map("cfo_threshold_alerts")
+}
+
+model CommissionAccrualLedger {
+  agent_id String?
+  amount Float
+  approved_at String?
+  approved_by String?
+  commission_role String?
+  created_at String
+  description String?
+  earned_at String
+  event_type String?
+  id String @id @default(uuid())
+  paid_at String?
+  percentage Float?
+  rejected_at String?
+  rejection_reason String?
+  rent_request_id String?
+  repayment_amount Float?
+  source_id String?
+  source_type String
+  status String
+  tenant_id String?
+
+  @@map("commission_accrual_ledger")
+}
+
+model ConversationParticipants {
+  conversation_id String
+  id String @id @default(uuid())
+  joined_at String
+  last_read_at String?
+  user_id String
+
+  @@map("conversation_participants")
+}
+
+model Conversations {
+  created_at String
+  id String @id @default(uuid())
+  updated_at String
+
+  @@map("conversations")
+}
+
+model CreditAccessDraws {
+  access_fee Float
+  agent_id String?
+  amount Float
+  amount_repaid Float
+  completed_at String?
+  created_at String
+  daily_charge Float
+  duration_days Float?
+  duration_months Float
+  expires_at String
+  id String @id @default(uuid())
+  monthly_rate Float
+  outstanding_balance Float
+  started_at String
+  status String
+  total_payable Float
+  updated_at String
+  user_id String
+
+  @@map("credit_access_draws")
+}
+
+model CreditAccessLimits {
+  base_limit Float
+  bonus_from_houses_listed Float
+  bonus_from_landlord_rent Float
+  bonus_from_partners_onboarded Float
+  bonus_from_ratings Float
+  bonus_from_receipts Float
+  bonus_from_rent_history Float
+  created_at String
+  id String @id @default(uuid())
+  total_limit Float?
+  updated_at String
+  user_id String
+
+  @@map("credit_access_limits")
+}
+
+model CreditDrawLedger {
+  agent_deducted Float
+  amount_deducted Float
+  closing_balance Float
+  created_at String
+  daily_charge Float
+  date String
+  deduction_status String
+  draw_id String
+  id String @id @default(uuid())
+  opening_balance Float
+
+  @@map("credit_draw_ledger")
+}
+
+model CreditRequestDetails {
+  agent_id String?
+  agent_verified Boolean?
+  agent_verified_at String?
+  borrower_id String
+  borrower_mm_name String
+  borrower_phone String
+  created_at String
+  duration_days Float
+  electricity_meter_number String?
+  funder_interest_rate Float
+  id String @id @default(uuid())
+  landlord_id String?
+  landlord_name String
+  landlord_on_platform Boolean?
+  landlord_phone String
+  loan_id String?
+  location_address String?
+  location_latitude Float?
+  location_longitude Float?
+  platform_fee_amount Float
+  platform_fee_rate Float
+  repayment_frequency String
+  total_with_fees Float
+  updated_at String
+  water_meter_number String?
+
+  @@map("credit_request_details")
+}
+
+model DailyPlatformStats {
+  active_users_30d Float
+  created_at String
+  daily_transaction_volume Float
+  id String @id @default(uuid())
+  new_users_today Float
+  referral_pct Float
+  retention_pct Float
+  stat_date String
+  total_users Float
+  updated_at String
+  users_by_role Json?
+
+  @@map("daily_platform_stats")
+}
+
+model DefaultRecoveryLedger {
+  agent_id String?
+  created_at String
+  default_amount Float
+  default_date String
+  id String @id @default(uuid())
+  last_recovery_date String?
+  notes String?
+  platform_loss Float
+  recovered_amount Float
+  rent_request_id String?
+  status String
+  tenant_id String?
+  updated_at String
+  write_off_approved_by String?
+  write_off_date String?
+  written_off_amount Float
+
+  @@map("default_recovery_ledger")
+}
+
+model Departments {
+  created_at String
+  description String?
+  head_user_id String?
+  id String @id @default(uuid())
+  is_active Boolean
+  name String
+  updated_at String
+
+  @@map("departments")
+}
+
+model DepositRequests {
+  agent_id String?
+  amount Float
+  approved_at String?
+  audit_flagged Boolean?
+  auto_approved Boolean?
+  batch_run_id String?
+  created_at String
+  id String @id @default(uuid())
+  notes String?
+  processed_by String?
+  provider String?
+  rejected_at String?
+  rejection_reason String?
+  status String
+  transaction_date String?
+  transaction_id String?
+  updated_at String
+  user_id String
+
+  @@map("deposit_requests")
+}
+
+model DisbursementRecords {
+  agent_confirmed Boolean?
+  agent_confirmed_at String?
+  agent_id String?
+  amount Float
+  created_at String
+  disbursed_at String
+  disbursed_by String?
+  id String @id @default(uuid())
+  landlord_confirmed Boolean?
+  landlord_confirmed_at String?
+  landlord_id String?
+  notes String?
+  payout_method String
+  reconciliation_status String
+  rent_request_id String
+  tenant_id String
+  transaction_reference String?
+
+  @@map("disbursement_records")
+}
+
+model DisciplinaryRecords {
+  action_type String
+  created_at String
+  description String
+  effective_date String
+  employee_id String
+  expiry_date String?
+  id String @id @default(uuid())
+  issued_by String
+  resolution_note String?
+  severity String
+  status String
+
+  @@map("disciplinary_records")
+}
+
+model EarningBaselines {
+  avg_daily_earnings Float?
+  avg_receipts_per_day Float?
+  avg_referrals_per_week Float?
+  avg_weekly_earnings Float?
+  last_calculated_at String?
+  receipt_count_7d Float?
+  referral_count_7d Float?
+  total_agent_earnings Float?
+  user_id String
+
+  @@map("earning_baselines")
+}
+
+model EarningPredictions {
+  assumptions Json?
+  confidence Float
+  created_at String
+  id String @id @default(uuid())
+  period String
+  predicted_earnings Float
+  user_id String
+
+  @@map("earning_predictions")
+}
+
+model FeeRevenueLedger {
+  created_at String
+  deferred_amount Float
+  fee_type String
+  id String @id @default(uuid())
+  notes String?
+  recognition_date String?
+  recognized_amount Float
+  rent_request_id String?
+  status String
+  tenant_id String?
+  total_amount Float
+  updated_at String
+
+  @@map("fee_revenue_ledger")
+}
+
+model FinancialAgents {
+  agent_id String
+  assigned_by String
+  created_at String
+  expense_category String
+  id String @id @default(uuid())
+  is_active Boolean
+  label String
+  notes String?
+  updated_at String
+
+  @@map("financial_agents")
+}
+
+model FloatRequests {
+  agent_id String
+  approved_at String?
+  approved_by String?
+  created_at String
+  id String @id @default(uuid())
+  reason String?
+  rejection_reason String?
+  requested_amount Float
+  status String
+  updated_at String
+
+  @@map("float_requests")
+}
+
+model FunderVisits {
+  accuracy Float?
+  agent_id String?
+  created_at String
+  funder_id String?
+  id String @id @default(uuid())
+  latitude Float
+  location_name String?
+  longitude Float
+  notes String?
+  visit_type String
+
+  @@map("funder_visits")
+}
+
+model GeneralLedger {
+  account String?
+  amount Float
+  category String
+  classification String?
+  created_at String
+  currency String
+  description String?
+  direction String
+  id String @id @default(uuid())
+  idempotency_key String?
+  ledger_scope String
+  linked_party String?
+  reference_id String?
+  running_balance Float?
+  source_id String?
+  source_table String
+  transaction_date String
+  transaction_group_id String?
+  user_id String?
+
+  @@map("general_ledger")
+}
+
+model HouseListings {
+  access_fee Float
+  address String
+  agent_id String
+  amenities String?
+  caretaker_name String?
+  caretaker_phone String?
+  caretaker_user_id String?
+  created_at String
+  daily_rate Float
+  description String?
+  district String?
+  geo_point String
+  has_electricity Boolean?
+  has_parking Boolean?
+  has_security Boolean?
+  has_water Boolean?
+  house_category String
+  id String @id @default(uuid())
+  image_urls String?
+  is_agent_caretaker Boolean?
+  is_furnished Boolean?
+  landlord_accepted Boolean?
+  landlord_has_smartphone Boolean?
+  landlord_id String?
+  latitude Float?
+  lc1_chairperson_name String?
+  lc1_chairperson_phone String?
+  lc1_chairperson_village String?
+  listing_bonus_paid Boolean?
+  listing_bonus_paid_at String?
+  longitude Float?
+  monthly_rent Float
+  number_of_rooms Float
+  platform_fee Float
+  region String
+  short_code String?
+  status String
+  sub_county String?
+  tenant_id String?
+  title String
+  total_monthly_cost Float
+  updated_at String
+  verified Boolean?
+  verified_at String?
+  verified_by String?
+  video_url String?
+  village String?
+
+  @@map("house_listings")
+}
+
+model HouseQuestions {
+  answer_text String?
+  answered_at String?
+  answered_by String?
+  asker_id String
+  created_at String
+  house_id String
+  id String @id @default(uuid())
+  question_text String
+  updated_at String
+
+  @@map("house_questions")
+}
+
+model HouseReviews {
+  accuracy Float?
+  created_at String
+  house_id String
+  id String @id @default(uuid())
+  latitude Float
+  longitude Float
+  rating Float
+  review_text String?
+  reviewer_id String
+  updated_at String
+
+  @@map("house_reviews")
+}
+
+model InvestmentWithdrawalRequests {
+  amount Float
+  cfo_processed_at String?
+  cfo_processed_by String?
+  coo_approved_at String?
+  coo_approved_by String?
+  created_at String
+  earliest_process_date String
+  id String @id @default(uuid())
+  partner_ops_approved_at String?
+  partner_ops_approved_by String?
+  processed_at String?
+  processed_by String?
+  reason String?
+  rejection_reason String?
+  requested_at String
+  rewards_paused Boolean
+  status String
+  updated_at String
+  user_id String
+
+  @@map("investment_withdrawal_requests")
+}
+
+model InvestorPortfolios {
+  account_name String?
+  account_number String?
+  activation_token String
+  agent_id String
+  auto_reinvest Boolean
+  bank_account_name String?
+  bank_name String?
+  cfo_rejection_reason String?
+  cfo_verified Boolean?
+  cfo_verified_at String?
+  cfo_verified_by String?
+  created_at String
+  display_currency String
+  duration_months Float
+  id String @id @default(uuid())
+  investment_amount Float
+  investment_reference String?
+  investor_id String?
+  invite_id String?
+  maturity_alert_30d Boolean
+  maturity_alert_7d Boolean
+  maturity_date String?
+  mobile_money_number String?
+  mobile_network String?
+  next_roi_date String?
+  payment_method String?
+  payout_day Float?
+  portfolio_code String
+  portfolio_pin String
+  receipt_file_url String?
+  roi_mode String
+  roi_percentage Float
+  status String
+  total_roi_earned Float
+
+  @@map("investor_portfolios")
+}
+
+model LandlordAmbassadorReferrals {
+  commission_earned Float
+  created_at String
+  id String @id @default(uuid())
+  referred_landlord_id String
+  referred_landlord_name String
+  referred_landlord_phone String
+  referrer_landlord_id String
+  rent_processed Float
+  status String
+  updated_at String
+
+  @@map("landlord_ambassador_referrals")
+}
+
+model Landlords {
+  account_number String?
+  bank_name String?
+  caretaker_name String?
+  caretaker_phone String?
+  cell String?
+  country String?
+  county String?
+  created_at String
+  description String?
+  desired_rent_from_welile Float?
+  district String?
+  electricity_meter_number String?
+  has_smartphone Boolean?
+  house_category String?
+  house_number String?
+  id String @id @default(uuid())
+  is_agent_managed Boolean?
+  is_occupied Boolean
+  latitude Float?
+  location_captured_at String?
+  location_captured_by String?
+  longitude Float?
+  managed_by_agent_id String?
+  management_fee_rate Float?
+  mobile_money_name String?
+  mobile_money_number String?
+  monthly_rent Float?
+  name String
+  number_of_houses Float?
+  number_of_rooms Float?
+  phone String
+  property_address String
+  ready_to_receive Boolean?
+  region String?
+  registered_by String?
+  rent_balance_due Float
+  rent_last_paid_amount Float?
+  rent_last_paid_at String?
+  sub_county String?
+  tenant_id String?
+  tin String?
+  town_council String?
+  verification_pin_1 String?
+  verification_pin_2 String?
+  verified Boolean?
+  verified_at String?
+  verified_by String?
+  village String?
+  water_meter_number String?
+
+  @@map("landlords")
+}
+
+model Lc1Chairpersons {
+  created_at String
+  id String @id @default(uuid())
+  name String
+  phone String
+  village String
+
+  @@map("lc1_chairpersons")
+}
+
+model LeaveBalances {
+  created_at String
+  employee_id String
+  id String @id @default(uuid())
+  leave_type String
+  remaining_days Float
+  total_days Float
+  updated_at String
+  used_days Float
+  year Float
+
+  @@map("leave_balances")
+}
+
+model LeaveRequests {
+  created_at String
+  days_count Float
+  employee_id String
+  end_date String
+  id String @id @default(uuid())
+  leave_type String
+  reason String
+  review_note String?
+  reviewed_at String?
+  reviewed_by String?
+  start_date String
+  status String
+
+  @@map("leave_requests")
+}
+
+model LedgerAccountGroups {
+  description String
+  group_code String
+  group_id String
+
+  @@map("ledger_account_groups")
+}
+
+model LedgerAccounts {
+  account_code String
+  account_id String
+  allow_negative Boolean?
+  created_at String?
+  currency String?
+  group_id String
+  owner_id String?
+  owner_type String?
+
+  @@map("ledger_accounts")
+}
+
+model LedgerEntries {
+  account_id String
+  amount Float
+  created_at String
+  currency String?
+  direction String
+  entry_id String
+  transaction_id String
+
+  @@map("ledger_entries")
+}
+
+model LedgerTransactions {
+  approved_by String?
+  category String
+  created_at String
+  description String?
+  initiated_by String?
+  source_id String?
+  source_table String?
+  transaction_group_id String?
+  transaction_id String
+
+  @@map("ledger_transactions")
+}
+
+model LiquidityAlerts {
+  agent_id String
+  alert_type String
+  created_at String
+  id String @id @default(uuid())
+  message String
+  resolved Boolean?
+  resolved_at String?
+  resolved_by String?
+  severity String
+
+  @@map("liquidity_alerts")
+}
+
+model ListingBonusApprovals {
+  agent_id String
+  amount Float
+  cfo_approved_at String?
+  cfo_approved_by String?
+  cfo_notes String?
+  created_at String
+  id String @id @default(uuid())
+  landlord_ops_approved_at String?
+  landlord_ops_approved_by String?
+  landlord_ops_notes String?
+  ledger_entry_id String?
+  listing_id String
+  paid_at String?
+  rejected_at String?
+  rejected_by String?
+  rejection_reason String?
+  status String
+  updated_at String
+
+  @@map("listing_bonus_approvals")
+}
+
+model LoanApplications {
+  amount Float
+  created_at String
+  id String @id @default(uuid())
+  status String
+  updated_at String
+  user_id String
+
+  @@map("loan_applications")
+}
+
+model LocationRequests {
+  accuracy Float?
+  captured_at String?
+  created_at String
+  id String @id @default(uuid())
+  latitude Float?
+  longitude Float?
+  rent_request_id String
+  requested_by String
+  status String
+  target_role String
+  target_user_id String
+  token String
+
+  @@map("location_requests")
+}
+
+model Messages {
+  content String
+  conversation_id String
+  created_at String
+  id String @id @default(uuid())
+  read_at String?
+  sender_id String
+
+  @@map("messages")
+}
+
+model MoneyRequests {
+  amount Float
+  created_at String
+  description String?
+  id String @id @default(uuid())
+  recipient_id String
+  requester_id String
+  responded_at String?
+  status String
+
+  @@map("money_requests")
+}
+
+model Notifications {
+  created_at String?
+  id String @id @default(uuid())
+  is_read Boolean?
+  message String
+  metadata Json?
+  title String
+  type String
+  updated_at String?
+  user_id String
+
+  @@map("notifications")
+}
+
+model OnboardingTargets {
+  achieved_count Float
+  agent_id String
+  created_at String
+  id String @id @default(uuid())
+  target_count Float
+  target_month String
+  updated_at String
+
+  @@map("onboarding_targets")
+}
+
+model OperationsDepartments {
+  assigned_by String?
+  created_at String
+  department String
+  id String @id @default(uuid())
+  user_id String
+
+  @@map("operations_departments")
+}
+
+model OpportunitySummaries {
+  created_at String
+  id String @id @default(uuid())
+  notes String?
+  posted_by String
+  total_agents Float
+  total_landlords Float
+  total_rent_requested Float
+  total_requests Float
+  updated_at String
+
+  @@map("opportunity_summaries")
+}
+
+model OtpVerifications {
+  attempts Float
+  created_at String
+  expires_at String
+  id String @id @default(uuid())
+  otp_code String
+  phone String
+  updated_at String
+  verified Boolean
+  verified_at String?
+
+  @@map("otp_verifications")
+}
+
+model PartnerEscalations {
+  created_at String
+  details Json?
+  escalation_type String
+  id String @id @default(uuid())
+  portfolio_id String
+  resolved_at String?
+  resolved_by String?
+  status String
+
+  @@map("partner_escalations")
+}
+
+model PaymentTokens {
+  agent_id String
+  amount Float
+  created_at String
+  expires_at String
+  id String @id @default(uuid())
+  tenant_id String
+  token_code String
+  used Boolean
+  used_at String?
+  visit_id String?
+
+  @@map("payment_tokens")
+}
+
+model PayoutCodes {
+  amount Float
+  claimed_at String?
+  claimed_by String?
+  code String
+  created_at String
+  expires_at String
+  id String @id @default(uuid())
+  paid_at String?
+  paid_by String?
+  qr_data String
+  status String
+  user_id String?
+  withdrawal_request_id String
+
+  @@map("payout_codes")
+}
+
+model PayrollBatches {
+  approved_at String?
+  approved_by String?
+  batch_month String
+  created_at String
+  created_by String
+  employee_count Float?
+  id String @id @default(uuid())
+  notes String?
+  period_end String?
+  period_start String?
+  prepared_by String?
+  processed_at String?
+  processed_count Float
+  status String
+  submitted_at String?
+  total_amount Float
+  total_employees Float
+  updated_at String
+
+  @@map("payroll_batches")
+}
+
+model PayrollItems {
+  amount Float
+  batch_id String
+  bonuses Json
+  category String
+  created_at String
+  deductions Json
+  description String?
+  employee_id String
+  id String @id @default(uuid())
+  ledger_reference_id String?
+  paid_at String?
+  status String
+
+  @@map("payroll_items")
+}
+
+model PendingWalletOperations {
+  account String?
+  amount Float
+  category String
+  created_at String
+  description String?
+  direction String
+  id String @id @default(uuid())
+  linked_party String?
+  metadata Json?
+  operation_type String
+  payment_method String?
+  payment_reference String?
+  reference_id String?
+  rejection_reason String?
+  reviewed_at String?
+  reviewed_by String?
+  source_id String?
+  source_table String
+  status String
+  target_wallet_user_id String?
+  transaction_group_id String?
+  updated_at String
+  user_id String?
+
+  @@map("pending_wallet_operations")
+}
+
+model PlatformExpenseTransfers {
+  agent_id String
+  amount Float
+  approved_by String
+  created_at String
+  description String
+  expense_category String
+  financial_agent_id String
+  id String @id @default(uuid())
+  ledger_reference_id String?
+
+  @@map("platform_expense_transfers")
+}
+
+model PortfolioRenewals {
+  created_at String
+  id String @id @default(uuid())
+  new_created_at String
+  new_duration_months Float
+  new_maturity_date String?
+  new_roi_percentage Float
+  old_created_at String
+  old_duration_months Float
+  old_maturity_date String?
+  old_roi_percentage Float
+  portfolio_id String
+  reason String
+  renewed_by String
+  top_up_amount Float
+
+  @@map("portfolio_renewals")
+}
+
+model PreRegisteredTids {
+  amount Float
+  created_at String
+  id String @id @default(uuid())
+  matched_at String?
+  matched_deposit_id String?
+  notes String?
+  provider String?
+  registered_by String
+  status String
+  transaction_id String
+
+  @@map("pre_registered_tids")
+}
+
+model ProductCategories {
+  agent_id String
+  color String?
+  created_at String
+  id String @id @default(uuid())
+  name String
+
+  @@map("product_categories")
+}
+
+model ProductImages {
+  created_at String
+  display_order Float
+  id String @id @default(uuid())
+  image_url String
+  product_id String
+
+  @@map("product_images")
+}
+
+model ProductOrders {
+  agent_commission Float
+  agent_id String
+  buyer_id String
+  created_at String
+  delivery_notes String?
+  estimated_delivery_date String?
+  id String @id @default(uuid())
+  product_id String
+  quantity Float
+  status String
+  status_updated_at String?
+  total_price Float
+  unit_price Float
+
+  @@map("product_orders")
+}
+
+model ProductReviews {
+  buyer_id String
+  comment String?
+  created_at String
+  id String @id @default(uuid())
+  order_id String?
+  product_id String
+  rating Float
+  updated_at String
+
+  @@map("product_reviews")
+}
+
+model Products {
+  active Boolean
+  agent_id String
+  category String
+  created_at String
+  description String?
+  discount_ends_at String?
+  discount_percentage Float?
+  id String @id @default(uuid())
+  image_url String?
+  name String
+  price Float
+  stock Float
+  updated_at String
+
+  @@map("products")
+}
+
+model Profiles {
+  agent_type String?
+  avatar_url String?
+  city String?
+  country String?
+  country_code String?
+  created_at String
+  email String
+  frozen_at String?
+  frozen_reason String?
+  full_name String
+  id String @id @default(uuid())
+  is_frozen Boolean
+  is_seller Boolean
+  last_active_at String?
+  mobile_money_number String?
+  mobile_money_provider String?
+  monthly_rent Float?
+  must_change_password Boolean?
+  national_id String?
+  phone String
+  referrer_id String?
+  rent_discount_active Boolean
+  seller_application_status String?
+  territory String?
+  updated_at String
+  verified Boolean
+  whatsapp_verified Boolean?
+  whatsapp_verified_at String?
+
+  @@map("profiles")
+}
+
+model PropertyViewings {
+  agent_checkin_at String?
+  agent_checkin_lat Float?
+  agent_checkin_lng Float?
+  agent_confirmed Boolean?
+  agent_confirmed_at String?
+  agent_feedback String?
+  agent_id String
+  agent_rated_at String?
+  agent_rating Float?
+  assigned_by String?
+  confirmation_count Float?
+  confirmation_sms_sent Boolean?
+  created_at String?
+  house_listing_id String
+  id String @id @default(uuid())
+  landlord_confirmed Boolean?
+  landlord_confirmed_at String?
+  landlord_id String?
+  meeting_verified Boolean?
+  notes String?
+  pin_verified Boolean?
+  pin_verified_at String?
+  proximity_distance_m Float?
+  proximity_verified Boolean?
+  scheduled_date String?
+  scheduled_time String?
+  sms_sent Boolean?
+  status String
+  tenant_checkin_at String?
+  tenant_checkin_lat Float?
+  tenant_checkin_lng Float?
+  tenant_confirmed Boolean?
+  tenant_confirmed_at String?
+  tenant_feedback String?
+  tenant_id String
+  tenant_rated_at String?
+  tenant_rating Float?
+  updated_at String?
+  viewing_pin String?
+
+  @@map("property_viewings")
+}
+
+model ProxyAgentAssignments {
+  agent_id String
+  approval_status String
+  approved_at String?
+  approved_by String?
+  assigned_by String
+  beneficiary_id String
+  beneficiary_role String
+  created_at String
+  expires_at String?
+  id String @id @default(uuid())
+  is_active Boolean
+  is_managed_account Boolean
+  reason String?
+  rejection_reason String?
+  updated_at String
+
+  @@map("proxy_agent_assignments")
+}
+
+model PushSubscriptions {
+  auth String
+  created_at String
+  endpoint String
+  id String @id @default(uuid())
+  p256dh String
+  updated_at String
+  user_id String
+
+  @@map("push_subscriptions")
+}
+
+model ReceiptNumbers {
+  created_at String
+  created_by String
+  id String @id @default(uuid())
+  receipt_code String
+  status String
+  vendor_amount Float?
+  vendor_id String
+  vendor_marked_at String?
+
+  @@map("receipt_numbers")
+}
+
+model ReferralRewards {
+  created_at String
+  credited Boolean
+  credited_at String?
+  id String @id @default(uuid())
+  rank Float
+  referral_count Float
+  reward_amount Float
+  reward_month String
+  user_id String
+
+  @@map("referral_rewards")
+}
+
+model Referrals {
+  bonus_amount Float
+  created_at String
+  credited Boolean
+  credited_at String?
+  first_transaction_bonus_amount Float?
+  first_transaction_bonus_credited Boolean?
+  first_transaction_bonus_credited_at String?
+  id String @id @default(uuid())
+  referred_id String
+  referrer_id String
+
+  @@map("referrals")
+}
+
+model RentHistoryRecords {
+  created_at String
+  end_date String?
+  id String @id @default(uuid())
+  landlord_name String
+  landlord_phone String
+  months_paid Float
+  property_location String
+  rejection_reason String?
+  rent_amount Float
+  start_date String?
+  status String
+  tenant_id String
+  updated_at String
+  verified_at String?
+  verified_by String?
+
+  @@map("rent_history_records")
+}
+
+model RentRequestDeletions {
+  agent_id String?
+  agent_name String?
+  agent_phone String?
+  amount_repaid Float
+  created_at String
+  daily_repayment Float
+  deleted_by String
+  deleted_by_name String?
+  deletion_reason String?
+  disbursed_at String?
+  expires_at String
+  id String @id @default(uuid())
+  outstanding Float
+  rent_amount Float
+  rent_request_id String
+  request_status String?
+  snapshot_json Json?
+  tenant_id String
+  tenant_name String
+  tenant_phone String?
+  tenant_wallet Float
+  total_repayment Float
+
+  @@map("rent_request_deletions")
+}
+
+model RentRequests {
+  access_fee Float
+  agent_id String?
+  agent_verified Boolean?
+  agent_verified_at String?
+  agent_verified_by String?
+  amount_repaid Float
+  approval_comment String?
+  approved_at String?
+  approved_by String?
+  assigned_agent_id String?
+  cfo_reviewed_at String?
+  cfo_reviewed_by String?
+  coo_reviewed_at String?
+  coo_reviewed_by String?
+  created_at String
+  daily_repayment Float
+  disbursed_at String?
+  duration_days Float
+  fund_recipient_id String?
+  fund_recipient_name String?
+  fund_recipient_type String?
+  fund_routed_at String?
+  funded_at String?
+  house_category String?
+  house_image_urls String?
+  id String @id @default(uuid())
+  initial_outstanding_balance Float?
+  landlord_id String
+  landlord_ops_reviewed_at String?
+  landlord_ops_reviewed_by String?
+  lc1_id String
+  manager_verified Boolean?
+  manager_verified_at String?
+  manager_verified_by String?
+  next_roi_due_date String?
+  number_of_payments Float?
+  payout_method String?
+  payout_transaction_reference String?
+  registration_type String
+  rejected_reason String?
+  rent_amount Float
+  request_city String?
+  request_country String?
+  request_fee Float
+  request_latitude Float?
+  request_longitude Float?
+  roi_payments_count Float?
+  schedule_status String?
+  status String?
+  supporter_id String?
+  tenant_electricity_meter String?
+  tenant_id String
+  tenant_no_smartphone Boolean
+  tenant_ops_reviewed_at String?
+  tenant_ops_reviewed_by String?
+  tenant_water_meter String?
+  total_repayment Float
+  total_roi_paid Float?
+  updated_at String
+
+  @@map("rent_requests")
+}
+
+model Repayments {
+  amount Float
+  created_at String
+  id String @id @default(uuid())
+  rent_request_id String
+  tenant_id String
+
+  @@map("repayments")
+}
+
+model ReviewImages {
+  created_at String
+  display_order Float
+  id String @id @default(uuid())
+  image_url String
+  review_id String
+
+  @@map("review_images")
+}
+
+model ReviewResponses {
+  agent_id String
+  created_at String
+  id String @id @default(uuid())
+  response_text String
+  review_id String
+  updated_at String
+
+  @@map("review_responses")
+}
+
+model ReviewVotes {
+  created_at String
+  id String @id @default(uuid())
+  review_id String
+  user_id String
+  vote_type String
+
+  @@map("review_votes")
+}
+
+model RoleAccessRequests {
+  created_at String
+  id String @id @default(uuid())
+  reason String?
+  rejection_reason String?
+  requested_role String
+  reviewed_at String?
+  reviewed_by String?
+  status String
+  updated_at String
+  user_id String
+
+  @@map("role_access_requests")
+}
+
+model SavedHouses {
+  created_at String
+  house_id String
+  id String @id @default(uuid())
+  user_id String
+
+  @@map("saved_houses")
+}
+
+model ScheduledPayouts {
+  amount Float
+  category_id String
+  created_at String
+  created_by String
+  day_of_month Float
+  enabled Boolean
+  frequency String
+  id String @id @default(uuid())
+  last_run_at String?
+  next_run_at String?
+  reason String
+  sub_category String?
+  target_user_id String
+  updated_at String
+
+  @@map("scheduled_payouts")
+}
+
+model ServiceCentreSetups {
+  agent_id String
+  agent_name String
+  agent_phone String
+  approved_at String?
+  approved_by String?
+  created_at String?
+  id String @id @default(uuid())
+  latitude Float
+  location_name String?
+  longitude Float
+  photo_url String
+  rejection_reason String?
+  status String
+  verified_at String?
+  verified_by String?
+
+  @@map("service_centre_setups")
+}
+
+model SettlementReconciliationLedger {
+  channel String
+  created_at String
+  discrepancy_amount Float
+  external_amount Float
+  external_reference String?
+  id String @id @default(uuid())
+  notes String?
+  period_date String
+  reconciled_at String?
+  reconciled_by String?
+  status String
+  system_amount Float
+  updated_at String
+
+  @@map("settlement_reconciliation_ledger")
+}
+
+model ShadowAuditLogs {
+  created_at String
+  function_name String
+  id String @id @default(uuid())
+  is_match Boolean
+  primary_passed Boolean
+  shadow_errors Json?
+  shadow_passed Boolean
+
+  @@map("shadow_audit_logs")
+}
+
+model ShadowConfig {
+  enabled Boolean
+  id String @id @default(uuid())
+  sample_percentage Float
+  updated_at String
+
+  @@map("shadow_config")
+}
+
+model StaffAccessPasswords {
+  created_at String?
+  id String @id @default(uuid())
+  must_change Boolean?
+  password_hash String
+  updated_at String?
+  user_id String
+
+  @@map("staff_access_passwords")
+}
+
+model StaffPermissions {
+  granted_at String?
+  granted_by String?
+  id String @id @default(uuid())
+  permitted_dashboard String
+  user_id String
+
+  @@map("staff_permissions")
+}
+
+model StaffProfiles {
+  created_at String?
+  created_by String?
+  department String
+  employee_id String
+  id String @id @default(uuid())
+  must_change_password Boolean?
+  position String
+  updated_at String?
+  user_id String
+
+  @@map("staff_profiles")
+}
+
+model SubscriptionChargeLogs {
+  amount_deducted Float
+  charge_amount Float
+  charge_date String
+  created_at String
+  debt_added Float
+  id String @id @default(uuid())
+  status String
+  subscription_id String
+  tenant_id String
+  wallet_balance_after Float?
+  wallet_balance_before Float?
+
+  @@map("subscription_charge_logs")
+}
+
+model SubscriptionCharges {
+  accumulated_debt Float
+  agent_charge_count Float
+  agent_charged_amount Float
+  agent_id String?
+  charge_agent_wallet Boolean
+  charge_amount Float
+  charges_completed Float
+  charges_remaining Float
+  consecutive_failures Float
+  created_at String
+  end_date String?
+  frequency String
+  id String @id @default(uuid())
+  next_charge_date String
+  rent_request_id String?
+  service_type String
+  start_date String
+  status String
+  tenant_failed_at String?
+  tenant_id String
+  total_charged Float
+  total_charges_due Float
+  updated_at String
+
+  @@map("subscription_charges")
+}
+
+model SupporterAgreementAcceptance {
+  accepted_at String
+  agreement_version String
+  created_at String
+  device_info String?
+  id String @id @default(uuid())
+  ip_address String?
+  status String
+  supporter_id String
+
+  @@map("supporter_agreement_acceptance")
+}
+
+model SupporterCapitalLedger {
+  amount Float
+  balance_after Float
+  created_at String
+  description String?
+  id String @id @default(uuid())
+  reference_id String?
+  rent_request_id String?
+  supporter_id String
+  transaction_type String
+
+  @@map("supporter_capital_ledger")
+}
+
+model SupporterInvites {
+  account_name String?
+  account_number String?
+  activated_at String?
+  activated_user_id String?
+  activation_token String
+  bank_name String?
+  country String?
+  created_at String
+  created_by String
+  district_city String?
+  email String
+  full_name String
+  id String @id @default(uuid())
+  latitude Float?
+  location_accuracy Float?
+  longitude Float?
+  mobile_money_number String?
+  mobile_network String?
+  national_id String?
+  next_of_kin_name String?
+  next_of_kin_phone String?
+  next_of_kin_relationship String?
+  parent_agent_id String?
+  payment_method String?
+  phone String
+  property_address String?
+  role String
+  status String
+  temp_password String?
+
+  @@map("supporter_invites")
+}
+
+model SupporterReferrals {
+  bonus_amount Float?
+  bonus_credited Boolean?
+  bonus_credited_at String?
+  created_at String
+  first_investment_at String?
+  id String @id @default(uuid())
+  referred_id String
+  referrer_id String
+
+  @@map("supporter_referrals")
+}
+
+model SupporterRoiPayments {
+  created_at String
+  due_date String
+  id String @id @default(uuid())
+  paid_at String?
+  payment_number Float
+  rent_amount Float
+  rent_request_id String
+  roi_amount Float
+  status String
+  supporter_id String
+
+  @@map("supporter_roi_payments")
+}
+
+model SuspenseLedger {
+  amount Float
+  created_at String
+  depositor_name String?
+  depositor_phone String?
+  id String @id @default(uuid())
+  matched_at String?
+  matched_by String?
+  matched_to_user_id String?
+  notes String?
+  reference_id String?
+  refunded_at String?
+  source_channel String
+  status String
+  updated_at String
+  written_off_at String?
+  written_off_by String?
+
+  @@map("suspense_ledger")
+}
+
+model SystemEvents {
+  created_at String?
+  event_type String
+  id String @id @default(uuid())
+  metadata Json?
+  processed Boolean?
+  processed_at String?
+  related_entity_id String?
+  related_entity_type String?
+  user_id String?
+
+  @@map("system_events")
+}
+
+model TenantAgreementAcceptance {
+  accepted_at String
+  agreement_version String
+  created_at String
+  device_info String?
+  id String @id @default(uuid())
+  ip_address String?
+  status String
+  tenant_id String
+
+  @@map("tenant_agreement_acceptance")
+}
+
+model TenantMerchantPayments {
+  agent_id String
+  amount Float
+  created_at String
+  id String @id @default(uuid())
+  merchant_name String
+  notes String?
+  payment_date String
+  tenant_id String?
+  tenant_phone String?
+  transaction_id String
+  updated_at String
+
+  @@map("tenant_merchant_payments")
+}
+
+model TenantRatings {
+  created_at String
+  id String @id @default(uuid())
+  landlord_id String
+  rating Float
+  tenant_id String
+  updated_at String
+
+  @@map("tenant_ratings")
+}
+
+model TenantReplacements {
+  created_at String
+  id String @id @default(uuid())
+  landlord_id String
+  new_tenant_id String
+  old_tenant_id String
+  outstanding_balance Float
+  reason String
+  rent_request_id String
+  replaced_by String
+
+  @@map("tenant_replacements")
+}
+
+model TenantTransfers {
+  created_at String
+  flag_type String?
+  from_agent_id String?
+  id String @id @default(uuid())
+  reason String
+  rent_requests_updated Float?
+  subscriptions_updated Float?
+  tenant_id String?
+  to_agent_id String?
+  transferred_by String?
+
+  @@map("tenant_transfers")
+}
+
+model TransactionApprovals {
+  approval_id String
+  approval_notes String?
+  approved_at String
+  approved_by String
+  transaction_id String?
+
+  @@map("transaction_approvals")
+}
+
+model TreasuryControls {
+  control_key String
+  enabled Boolean
+  id String @id @default(uuid())
+  updated_at String
+  updated_by String?
+
+  @@map("treasury_controls")
+}
+
+model UserActivityLog {
+  activity_type String
+  created_at String
+  description String
+  id String @id @default(uuid())
+  metadata Json?
+  performed_by String?
+  user_id String
+
+  @@map("user_activity_log")
+}
+
+model UserLoanRepayments {
+  amount Float
+  borrower_id String
+  created_at String
+  id String @id @default(uuid())
+  loan_id String
+  payment_method String
+
+  @@map("user_loan_repayments")
+}
+
+model UserLoans {
+  agent_verified Boolean?
+  agent_verified_at String?
+  agent_verified_by String?
+  ai_insurance_accepted Boolean?
+  ai_insurance_accepted_at String?
+  amount Float
+  borrower_id String
+  created_at String
+  due_date String
+  id String @id @default(uuid())
+  interest_rate Float
+  lender_id String
+  paid_amount Float
+  repaid_at String?
+  repayment_frequency String?
+  status String
+  total_repayment Float
+
+  @@map("user_loans")
+}
+
+model UserLocations {
+  accuracy Float?
+  address String?
+  captured_at String
+  city String?
+  country String?
+  created_at String
+  id String @id @default(uuid())
+  latitude Float
+  longitude Float
+  user_id String
+  verification_notes String?
+  verified Boolean?
+  verified_at String?
+  verified_by String?
+
+  @@map("user_locations")
+}
+
+model UserReceipts {
+  claimed_amount Float
+  created_at String
+  id String @id @default(uuid())
+  items_description String
+  loan_contribution Float?
+  receipt_number_id String
+  rejection_reason String?
+  user_id String
+  verified Boolean
+  verified_at String?
+
+  @@map("user_receipts")
+}
+
+model UserReviews {
+  created_at String
+  id String @id @default(uuid())
+  rating Float
+  review_text String?
+  reviewed_user_id String
+  reviewer_id String
+  reviewer_role String?
+  updated_at String
+
+  @@map("user_reviews")
+}
+
+model UserRiskScores {
+  consecutive_missed_payments Float?
+  consecutive_on_time_payments Float?
+  created_at String?
+  id String @id @default(uuid())
+  last_payment_date String?
+  last_risk_update String?
+  notes String?
+  risk_level String?
+  risk_score Float?
+  total_missed_payments Float?
+  total_on_time_payments Float?
+  updated_at String?
+  user_id String
+
+  @@map("user_risk_scores")
+}
+
+model UserRoles {
+  created_at String
+  enabled Boolean
+  id String @id @default(uuid())
+  role String
+  user_id String
+
+  @@map("user_roles")
+}
+
+model Vendors {
+  active Boolean
+  created_at String
+  created_by String
+  id String @id @default(uuid())
+  location String?
+  name String
+  phone String?
+  pin String?
+  pin_hash String?
+
+  @@map("vendors")
+}
+
+model VoidedLedgerEntries {
+  account String?
+  amount Float
+  category String
+  created_at String
+  description String?
+  direction String
+  id String @id @default(uuid())
+  linked_party String?
+  original_ledger_id String
+  reference_id String?
+  running_balance Float?
+  source_id String?
+  source_table String
+  transaction_date String
+  transaction_group_id String?
+  user_id String?
+  void_reason String
+  voided_at String
+  voided_by String
+
+  @@map("voided_ledger_entries")
+}
+
+model WalletDeductions {
+  amount Float
+  category String
+  created_at String
+  deducted_by String
+  id String @id @default(uuid())
+  ledger_entry_id String?
+  reason String
+  target_user_id String
+
+  @@map("wallet_deductions")
+}
+
+model WalletDeposits {
+  agent_id String
+  amount Float
+  created_at String
+  deposit_type String
+  id String @id @default(uuid())
+  user_id String
+
+  @@map("wallet_deposits")
+}
+
+model WalletTransactions {
+  amount Float
+  created_at String
+  description String?
+  id String @id @default(uuid())
+  recipient_id String
+  sender_id String
+
+  @@map("wallet_transactions")
+}
+
+model Wallets {
+  balance Float
+  created_at String
+  currency String
+  id String @id @default(uuid())
+  locked_balance Float
+  updated_at String
+  user_id String
+
+  @@map("wallets")
+}
+
+model WelileHomesSubscriptions {
+  created_at String
+  email_statements_enabled Boolean?
+  id String @id @default(uuid())
+  landlord_id String?
+  landlord_registered Boolean
+  last_interest_applied_at String?
+  last_statement_sent_at String?
+  monthly_rent Float
+  months_enrolled Float
+  notes String?
+  subscription_status String
+  tenant_id String
+  total_savings Float
+  updated_at String
+
+  @@map("welile_homes_subscriptions")
+}
+
+model Wishlists {
+  created_at String
+  id String @id @default(uuid())
+  product_id String
+  user_id String
+
+  @@map("wishlists")
+}
+
+model WithdrawalRequests {
+  agent_id String?
+  agent_location String?
+  amount Float
+  assigned_cashout_agent_id String?
+  auto_dispatched Boolean?
+  bank_account_name String?
+  bank_account_number String?
+  bank_name String?
+  cfo_approved_at String?
+  cfo_approved_by String?
+  coo_approved_at String?
+  coo_approved_by String?
+  created_at String
+  dispatched_at String?
+  fin_ops_approved_at String?
+  fin_ops_approved_by String?
+  fin_ops_payment_method String?
+  fin_ops_reference String?
+  fin_ops_verified_at String?
+  fin_ops_verified_by String?
+  id String @id @default(uuid())
+  linked_party String?
+  manager_approved_at String?
+  manager_approved_by String?
+  mobile_money_name String?
+  mobile_money_number String?
+  mobile_money_provider String?
+  payout_code String?
+  payout_method String
+  payout_proof String?
+  payout_proof_type String?
+  priority_level String?
+  processed_at String?
+  processed_by String?
+  reason String?
+  rejection_reason String?
+  status String
+  transaction_id String?
+  transaction_time String?
+  updated_at String
+  user_id String
+
+  @@map("withdrawal_requests")
+}
+

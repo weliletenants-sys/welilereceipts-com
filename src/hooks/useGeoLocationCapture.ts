@@ -13,7 +13,7 @@
    captureLocation: () => Promise<LocationData | null>;
  }
  
- export function useGeoLocation(): UseGeoLocationReturn {
+ export function useGeoLocationCapture(): UseGeoLocationReturn {
    const [location, setLocation] = useState<LocationData | null>(null);
    const [loading, setLoading] = useState(false);
    const [error, setError] = useState<string | null>(null);
