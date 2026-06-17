@@ -14,13 +14,17 @@ import supporterRoutes from './routes/supporter.routes';
 import tenantRoutes from './routes/tenant.routes';
 import agentRoutes from './routes/agent.routes';
 import cfoRoutes from './routes/cfo.routes';
+import tenantOpsRoutes from './routes/tenant-ops.routes';
 
 dotenv.config();
 
 const app = express();
 
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 app.use(express.json());
 app.use(morgan('dev'));
 
@@ -42,6 +46,7 @@ app.use('/supporter', supporterRoutes);
 app.use('/tenant', tenantRoutes);
 app.use('/agent', agentRoutes);
 app.use('/cfo', cfoRoutes);
+app.use('/tenant-ops', tenantOpsRoutes);
 
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack);

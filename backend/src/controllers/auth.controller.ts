@@ -19,10 +19,10 @@ export const register = async (req: Request, res: Response) => {
     }
 
     const now = new Date().toISOString();
-    
+
     // Hash the password
     const password_hash = await bcrypt.hash(password, 10);
-    
+
     // Create Profile
     const profile = await prisma.profiles.create({
       data: {
@@ -80,13 +80,21 @@ export const register = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const { email, phone, password } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ message: 'Missing required fields' });
+    if (!email && !phone) {
+      return res.status(400).json({ message: 'Missing email or phone' });
     }
 
-    const profile = await prisma.profiles.findFirst({ where: { email } });
+    const profile = await prisma.profiles.findFirst({
+      where: {
+        OR: [
+          ...(email ? [{ email }] : []),
+          ...(phone ? [{ phone }] : [])
+        ]
+      }
+    });
+
     if (!profile) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -100,7 +108,7 @@ export const login = async (req: Request, res: Response) => {
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
-    
+
     const userRole = await prisma.userRoles.findFirst({ where: { user_id: profile.id } });
     const role = userRole ? userRole.role : 'TENANT';
 
@@ -178,6 +186,52 @@ export const verifyOTP = async (req: Request, res: Response) => {
     return res.status(200).json({ message: 'OTP verified successfully' });
   } catch (error) {
     console.error('Verify OTP error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const getProfile = async (req: Request, res: Response) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ message: 'No token provided' });
+    
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    const profile = await prisma.profiles.findFirst({ where: { id: decoded.sub } });
+    if (!profile) return res.status(404).json({ message: 'User not found' });
+    
+    const userRole = await prisma.userRoles.findFirst({ where: { user_id: profile.id } });
+    const role = userRole ? userRole.role : 'TENANT';
+    
+    return res.status(200).json({
+      data: {
+        id: profile.id,
+        email: profile.email,
+        phone: profile.phone,
+        firstName: profile.full_name.split(' ')[0],
+        lastName: profile.full_name.split(' ').slice(1).join(' '),
+        role,
+        roles: [role]
+      }
+    });
+  } catch (error) {
+    console.error('Get profile error:', error);
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+};
+
+export const getUserRoles = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.query as { userId?: string };
+    if (!userId) return res.status(400).json({ message: 'User ID required' });
+    
+    const userRoles = await prisma.userRoles.findMany({
+      where: { user_id: userId },
+      select: { role: true }
+    });
+    
+    return res.status(200).json(userRoles);
+  } catch (error) {
+    console.error('Get roles error:', error);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
