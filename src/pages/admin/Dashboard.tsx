@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
   Crown, Cpu, Megaphone, MessageSquare, Users, Home, Building2,
-  Shield, Activity, BarChart3, Wallet, Handshake, ArrowLeft, Gift
+  Shield, Activity, BarChart3, Wallet, Handshake, ArrowLeft, Gift, FlaskConical
 } from 'lucide-react';
 import { useStaffPermissions } from '@/hooks/useStaffPermissions';
 import { useAuth } from '@/hooks/useAuth';
@@ -39,6 +39,11 @@ const operationsDashboards: DashboardCard[] = [
   { label: 'Referral Audit', description: 'Bonus status, ledger IDs & trigger reasons', icon: Gift, route: '/admin/referrals', color: 'bg-pink-500/10 text-pink-700 border-pink-500/30', permissionKey: 'financial-ops' },
 ];
 
+/** R&D hub — visible to anyone already on the staff access panel (no new roles/DB). */
+const researchDashboards: DashboardCard[] = [
+  { label: 'R&D', description: 'Business ideas & model experiments', icon: FlaskConical, route: '/rnd', color: 'bg-fuchsia-500/10 text-fuchsia-700 border-fuchsia-500/30', permissionKey: 'rnd' },
+];
+
 export default function AdminDashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -66,6 +71,8 @@ export default function AdminDashboardPage() {
 
   const visibleExecutive = executiveDashboards.filter(d => hasPermission(d.permissionKey));
   const visibleOperations = operationsDashboards.filter(d => hasPermission(d.permissionKey));
+  // Always show R&D on the staff hub — panel itself is RoleGuard'd; no new permission rows.
+  const visibleResearch = researchDashboards;
 
   return (
     <div className="min-h-screen bg-background">
@@ -139,7 +146,33 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {visibleExecutive.length === 0 && visibleOperations.length === 0 && (
+        {visibleResearch.length > 0 && (
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">Research & Development</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {visibleResearch.map((d) => (
+                <button
+                  key={d.label}
+                  onClick={() => navigate(d.route)}
+                  className={cn(
+                    'flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all hover:shadow-md hover:scale-[1.01] active:scale-[0.99]',
+                    d.color
+                  )}
+                >
+                  <div className="h-10 w-10 rounded-lg flex items-center justify-center bg-background/60">
+                    <d.icon className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm">{d.label}</p>
+                    <p className="text-xs text-muted-foreground truncate">{d.description}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {visibleExecutive.length === 0 && visibleOperations.length === 0 && visibleResearch.length === 0 && (
           <div className="text-center py-16 space-y-3">
             <Shield className="h-12 w-12 text-muted-foreground/30 mx-auto" />
             <p className="text-muted-foreground font-medium">No dashboards assigned</p>
