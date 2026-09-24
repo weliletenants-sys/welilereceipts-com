@@ -7,6 +7,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tool
 import { format, subMonths, startOfMonth, startOfDay } from 'date-fns';
 import { Activity, UserPlus, RefreshCw, Share2, ArrowRightLeft } from 'lucide-react';
 import { TrustCoverageSection } from './TrustCoverageSection';
+import { FundingWarRoom } from './war-room/FundingWarRoom';
 
 export function CEODashboard() {
   const { data: profiles, isLoading: loadingProfiles } = useQuery({
@@ -162,6 +163,16 @@ export function CEODashboard() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Funding War Room — CEO above-the-fold (100M day mission) */}
+      <FundingWarRoom />
+
+      {/* Secondary: existing overview content */}
+      <div className="pt-2 border-t border-border/60">
+        <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium mb-3 px-0.5">
+          Secondary overview
+        </p>
+      </div>
+
       {/* Mission scoreboard — Trust Coverage */}
       <TrustCoverageSection />
 
