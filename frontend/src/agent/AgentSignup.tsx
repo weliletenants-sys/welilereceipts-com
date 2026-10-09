@@ -1,7 +1,10 @@
 ﻿import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Lock, Mail, Phone, ArrowRight, ShieldCheck, UserCircle, CheckCircle2 } from 'lucide-react';
+import { Lock, Mail, Phone, ArrowRight, UserCircle, CheckCircle2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
+import OtpVerificationDeck from '../components/OtpVerificationDeck';
 
 export default function AgentSignup() {
   const [fullName, setFullName] = useState('');
@@ -11,7 +14,6 @@ export default function AgentSignup() {
   const [confirmPassword, setConfirmPassword] = useState('');
   
   const [otpSent, setOtpSent] = useState(false);
-  const [otpCode, setOtpCode] = useState('');
   const [isVerified, setIsVerified] = useState(false);
   
   const { login } = useAuth();
@@ -20,15 +22,13 @@ export default function AgentSignup() {
   const handleVerifyContact = () => {
     if (!phone) return alert('Enter phone number first');
     setOtpSent(true);
-    alert('Mock OTP "1234" sent to ' + phone);
+    toast('Mock OTP "1234" sent to ' + phone);
   };
 
-  const handleValidateOtp = () => {
-    if (otpCode === '1234') {
-      setIsVerified(true);
-    } else {
-      alert("Invalid OTP code. Please try '1234'.");
-    }
+  // Mock validation until the SMS OTP API is wired up.
+  const handleValidateOtp = async (code: string) => {
+    await new Promise((r) => setTimeout(r, 800));
+    return code === '1234';
   };
 
   const handleSignup = (e: React.FormEvent) => {
@@ -109,7 +109,7 @@ export default function AgentSignup() {
                 required
                 placeholder="Contact Number"
                 value={phone}
-                readOnly={isVerified}
+                readOnly={otpSent || isVerified}
                 onChange={(e) => setPhone(e.target.value)}
                 className={`w-full bg-white border border-gray-200 rounded-2xl py-3.5 pl-10 pr-4 text-gray-800 font-medium text-sm focus:outline-none focus:border-[#4A3AFF] focus:ring-4 focus:ring-blue-500/10 transition ${isVerified ? 'bg-gray-50 text-gray-500' : ''}`}
               />
@@ -126,33 +126,23 @@ export default function AgentSignup() {
                   Verify Contact
                 </button>
               ) : (
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500">
-                        <ShieldCheck size={18} strokeWidth={1.5} />
-                    </div>
-                    <input 
-                        type="text" 
-                        required
-                        placeholder="Enter OTP"
-                        value={otpCode}
-                        onChange={(e) => setOtpCode(e.target.value)}
-                        className="w-full bg-emerald-50 border border-emerald-200 rounded-xl py-3 pl-9 pr-3 text-gray-800 font-medium text-sm focus:outline-none focus:border-emerald-500 transition"
-                    />
-                  </div>
-                  <button 
-                    type="button" 
-                    onClick={handleValidateOtp}
-                    className="bg-emerald-500 text-white px-4 rounded-xl font-bold text-sm hover:bg-emerald-600 transition"
-                  >
-                    Validate
-                  </button>
-                </div>
+                <OtpVerificationDeck
+                  phone={phone}
+                  accent="#4A3AFF"
+                  onValidate={handleValidateOtp}
+                  onVerified={() => setIsVerified(true)}
+                  onResend={() => toast('Mock OTP "1234" re-sent to ' + phone)}
+                  onChangeNumber={() => setOtpSent(false)}
+                />
               )
             ) : (
-               <div className="flex items-center justify-center gap-2 p-3 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100 font-medium text-sm">
+               <motion.div
+                 initial={{ opacity: 0, scale: 0.95 }}
+                 animate={{ opacity: 1, scale: 1 }}
+                 className="flex items-center justify-center gap-2 p-3 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100 font-medium text-sm"
+               >
                  <CheckCircle2 size={18} /> Contact Verified
-               </div>
+               </motion.div>
             )}
 
             <div className="relative mt-2">

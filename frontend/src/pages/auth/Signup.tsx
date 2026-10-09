@@ -1,7 +1,10 @@
 ﻿import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Phone, Mail, Lock, Eye, EyeOff, ArrowRight, User, ShieldCheck } from 'lucide-react';
+import { Phone, Mail, Lock, Eye, EyeOff, ArrowRight, User, CheckCircle2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
+import OtpVerificationDeck from '../../components/OtpVerificationDeck';
 import PurpleBubbles from '../../components/PurpleBubbles';
 
 export default function Signup() {
@@ -16,7 +19,7 @@ export default function Signup() {
   
   const [rentAmount, setRentAmount] = useState('');  
   const [otpSent, setOtpSent] = useState(false);
-  const [otpCode, setOtpCode] = useState('');
+  const [isVerified, setIsVerified] = useState(false);
   const [error, setError] = useState('');
   
   const { login, intendedRole } = useAuth();
@@ -25,9 +28,15 @@ export default function Signup() {
   const refCode = searchParams.get('ref');
 
   const handleSendOtp = () => {
-    if (!phone) return alert('Enter phone number first');
+    if (!phone) return toast.error('Enter phone number first');
     setOtpSent(true);
-    alert('Mock OTP sent to ' + phone);
+    toast('Mock OTP sent to ' + phone);
+  };
+
+  // Mock validation until the SMS OTP API is wired up: any 4-digit code passes.
+  const handleValidateOtp = async (code: string) => {
+    await new Promise((r) => setTimeout(r, 800));
+    return /^\d{4}$/.test(code);
   };
 
   const handleSignup = (e: React.FormEvent) => {
@@ -43,7 +52,7 @@ export default function Signup() {
       setError("Passwords do not match!");
       return;
     }
-    if (!otpSent || !otpCode) {
+    if (!isVerified) {
       setError("Please verify your phone number first!");
       return;
     }
@@ -157,13 +166,22 @@ export default function Signup() {
                     type="tel" 
                     placeholder="0704825473"
                     value={phone}
+                    readOnly={otpSent || isVerified}
                     onChange={(e) => setPhone(e.target.value)}
                     className="w-full pl-11 pr-4 py-3 bg-slate-50 border-transparent focus:border-[#6c11d4]/30 focus:bg-white focus:ring-4 focus:ring-[#6c11d4]/10 rounded-xl transition-all outline-none text-slate-900 font-medium" 
                   />
                 </div>
               </div>
 
-              {!otpSent ? (
+              {isVerified ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex items-center justify-center gap-2 p-3 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100 font-semibold text-sm"
+                >
+                  <CheckCircle2 size={18} /> Phone Verified
+                </motion.div>
+              ) : !otpSent ? (
                 <button 
                   type="button" 
                   onClick={handleSendOtp}
@@ -172,21 +190,14 @@ export default function Signup() {
                   Send OTP Verification
                 </button>
               ) : (
-                 <div className="space-y-2">
-                   <label className="text-sm font-semibold text-emerald-700 ml-1">Enter OTP</label>
-                   <div className="relative group">
-                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-emerald-500 transition-colors">
-                        <ShieldCheck size={18} strokeWidth={2} />
-                     </div>
-                     <input 
-                        type="text" 
-                        placeholder="4-digit OTP"
-                        value={otpCode}
-                        onChange={(e) => setOtpCode(e.target.value)}
-                        className="w-full pl-11 pr-4 py-3 bg-emerald-50 border-transparent focus:border-emerald-500/30 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 rounded-xl transition-all outline-none text-slate-900 font-medium"
-                     />
-                   </div>
-                 </div>
+                <OtpVerificationDeck
+                  phone={phone}
+                  accent="#6c11d4"
+                  onValidate={handleValidateOtp}
+                  onVerified={() => setIsVerified(true)}
+                  onResend={() => toast('Mock OTP re-sent to ' + phone)}
+                  onChangeNumber={() => setOtpSent(false)}
+                />
               )}
 
               {intendedRole === 'TENANT' && (
